@@ -6,19 +6,24 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://example.com">
-  <title>Hexo</title>
+  <title>CVE-2021-2471 MySQL JDBC XXE | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="aaaa">
+  <meta name="description" content="AbstractPrior MySQL Connector&#x2F;J    8.0.27, the getSource() method exists in MysqlSQLXML, but the getSource() method has no security check when external general entities included in XML sources, conseq">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/2021/10/22/test-my-site/index.html">
+<meta property="og:title" content="CVE-2021-2471 MySQL JDBC XXE">
+<meta property="og:url" content="http://example.com/2021/10/22/mysql-jdbc-xxe/">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="aaaa">
+<meta property="og:description" content="AbstractPrior MySQL Connector&#x2F;J    8.0.27, the getSource() method exists in MysqlSQLXML, but the getSource() method has no security check when external general entities included in XML sources, conseq">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2021-10-22T02:41:00.000Z">
-<meta property="article:modified_time" content="2021-10-22T04:26:23.434Z">
+<meta property="og:image" content="http://example.com/images/pasted-2.png">
+<meta property="og:image" content="http://example.com/images/pasted-4.png">
+<meta property="og:image" content="http://example.com/images/pasted-1.png">
+<meta property="og:image" content="http://example.com/images/pasted-5.png">
+<meta property="article:published_time" content="2021-10-22T06:33:30.000Z">
+<meta property="article:modified_time" content="2021-10-22T07:48:45.307Z">
 <meta property="article:author" content="pyn3rd">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/pasted-2.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -148,12 +153,44 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-test-my-site" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-mysql-jdbc-xxe" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      CVE-2021-2471 MySQL JDBC XXE
+    </h1>
+  
+
+        
+        <a href="/2021/10/22/mysql-jdbc-xxe/" class="archive-article-date">
+  	<time datetime="2021-10-22T06:33:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-22</time>
+</a>
+        
+      </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h5 id="aaaa"><a href="#aaaa" class="headerlink" title="aaaa"></a>aaaa</h5>
+        <h5 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h5><p>Prior MySQL Connector/J    8.0.27, the <code>getSource()</code> method exists in MysqlSQLXML, but the <code>getSource()</code> method has no security check when external general entities included in XML sources, consequently,here exists a XXE vulnerability.</p>
+<h5 id="Analytics"><a href="#Analytics" class="headerlink" title="Analytics"></a>Analytics</h5><p>Set break piont at the <code>getSource()</code> method, according to the source code, if the class is <code>DOMSource</code> , <code>DocumentBuilder</code> will be utilized to parse the XML source data.<br><img src="/images/pasted-2.png" alt="upload successful"></p>
+<p>Unfortunly, there is no any security check when a new instance created. So we can construct a XML with external entities.<br><img src="/images/pasted-4.png" alt="upload successful"></p>
+<p>However,from MySQL Connector/J 8.0.27, security attributes are set up to check XML sources before the object is instantiated.<br><img src="/images/pasted-1.png" alt="upload successful"></p>
+<p><img src="/images/pasted-5.png" alt="upload successful"></p>
+<h5 id="Fix"><a href="#Fix" class="headerlink" title="Fix"></a>Fix</h5><p>In line with good XML practices, the getSource() method of MysqlSQLXML no longer supports external DTD, external general entities, and external general parameters in XML sources. </p>
+<h5 id="Timeline"><a href="#Timeline" class="headerlink" title="Timeline"></a>Timeline</h5><ul>
+<li><p>2021/07/10 Reported to Oracle</p>
+</li>
+<li><p>2021/07/23 Fixed the issue</p>
+</li>
+<li><p>2021/10/19 Credit us and assign CVE number</p>
+</li>
+<li><p>2021/10/19 Release MySQL Connector/J 8.0.27 </p>
+</li>
+</ul>
+<h5 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h5><p><a target="_blank" rel="noopener" href="https://www.oracle.com/security-alerts/cpuoct2021.html">https://www.oracle.com/security-alerts/cpuoct2021.html</a><br><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/relnotes/connector-j/8.0/en/news-8-0-27.html">https://dev.mysql.com/doc/relnotes/connector-j/8.0/en/news-8-0-27.html</a><br><a target="_blank" rel="noopener" href="https://github.com/mysql/mysql-connector-j/commits/4993d5735fd84a46e7d949ad1bcaa0e9bb039824/src/main/user-impl/java/com/mysql/cj/jdbc/MysqlSQLXML.java">https://github.com/mysql/mysql-connector-j/commits/4993d5735fd84a46e7d949ad1bcaa0e9bb039824/src/main/user-impl/java/com/mysql/cj/jdbc/MysqlSQLXML.java</a></p>
+
       
 
       
@@ -232,7 +269,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://example.com/2021/10/22/test-my-site/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://example.com/2021/10/22/mysql-jdbc-xxe/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -299,7 +336,7 @@
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
-		toc_hide_index: true,
+		toc_hide_index: false,
 		root: "/",
 		innerArchive: true,
 		showTags: false
