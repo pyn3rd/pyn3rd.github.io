@@ -154,9 +154,9 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h5 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h5><p>Prior MySQL Connector/J    8.0.27, the <code>getSource()</code> method exists in <code>MysqlSQLXML</code>, but the <code>getSource()</code> method has no security check when external general entities included in XML sources, consequently,here exists a XXE vulnerability.</p>
+        <h5 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h5><p>Prior to MySQL Connector/J    8.0.27, the <code>getSource()</code> method exists in <code>MysqlSQLXML</code>, but the <code>getSource()</code> method has no security check when external general entities included in XML sources, consequently,here exists a XXE vulnerability.</p>
 <h5 id="Analytics"><a href="#Analytics" class="headerlink" title="Analytics"></a>Analytics</h5><p>Set break piont at the <code>getSource()</code> method, according to the source code, if the class is <code>DOMSource</code> , <code>DocumentBuilder</code> will be utilized to parse the XML source data.<br><img src="/images/pasted-2.png" alt="upload successful"></p>
-<p>Unfortunly, there is no any security check when a new instance created. So we can construct a XML with external entities.<br><img src="/images/pasted-4.png" alt="upload successful"></p>
+<p>Unfortunately, there is no any security check when a new instance created. So we can construct a XML with external entities.<br><img src="/images/pasted-4.png" alt="upload successful"></p>
 <p>However,from MySQL Connector/J 8.0.27, security attributes are set up to check XML sources before the object is instantiated.<br><img src="/images/pasted-1.png" alt="upload successful"></p>
 <p><img src="/images/pasted-5.png" alt="upload successful"></p>
 <h5 id="Fix"><a href="#Fix" class="headerlink" title="Fix"></a>Fix</h5><p>In line with good XML practices, the getSource() method of MysqlSQLXML no longer supports external DTD, external general entities, and external general parameters in XML sources. </p>
