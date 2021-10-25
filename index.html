@@ -169,7 +169,7 @@
 <p>Consequently you can retreive the content of file <code>/etc/passwd</code></p>
 <p><img src="/images/pasted-16.png" alt="upload successful"></p>
 <h5 id="Proof-of-Concept"><a href="#Proof-of-Concept" class="headerlink" title="Proof of Concept"></a>Proof of Concept</h5><p><code>http://localhost:8887/manage/log/view?filename=/etc/passwd&amp;base=../../../../../</code></p>
-<h5 id="Fix"><a href="#Fix" class="headerlink" title="Fix"></a>Fix</h5><p><img src="/images/pasted-17.png" alt="upload successful"></p>
+<h5 id="Fix"><a href="#Fix" class="headerlink" title="Fix"></a>Fix</h5><p>From spring-boot-actuator-logview 0.2.13, <code>basePath</code> has strict security check, the path traversal is not permitted any more.<br><img src="/images/pasted-17.png" alt="upload successful"></p>
 
       
 
