@@ -20,7 +20,7 @@
 <meta property="og:image" content="http://pynerd.cn/images/pasted-1.png">
 <meta property="og:image" content="http://pynerd.cn/images/pasted-6.png">
 <meta property="article:published_time" content="2021-10-22T06:33:00.000Z">
-<meta property="article:modified_time" content="2021-10-25T02:43:03.709Z">
+<meta property="article:modified_time" content="2021-10-25T06:08:16.997Z">
 <meta property="article:author" content="pyn3rd">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://pynerd.cn/images/pasted-2.png">
@@ -166,7 +166,7 @@
 <p>Unfortunately, there is no any security check when a new instance created. So we can construct a XML with external entities.<br><img src="/images/pasted-4.png" alt="upload successful"></p>
 <p>However, from MySQL Connector/J 8.0.27, security attributes are set up to check XML sources before the object instantiated.<br><img src="/images/pasted-1.png" alt="upload successful"></p>
 <p><img src="/images/pasted-6.png" alt="upload successful"></p>
-<h5 id="PoC"><a href="#PoC" class="headerlink" title="PoC"></a>PoC</h5><pre><code>import com.mysql.cj.jdbc.MysqlSQLXML;
+<h5 id="Proof-of-Concept"><a href="#Proof-of-Concept" class="headerlink" title="Proof of Concept"></a>Proof of Concept</h5><pre><code>import com.mysql.cj.jdbc.MysqlSQLXML;
 import javax.xml.transform.dom.DOMSource;
 import java.sql.SQLException;
 
