@@ -134,6 +134,245 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Jython" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/11/03/Jython/">Jython</a>
+    </h1>
+  
+
+        
+        <a href="/2021/11/03/Jython/" class="archive-article-date">
+  	<time datetime="2021-11-03T02:55:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-11-03</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id=""><a href="#" class="headerlink" title=""></a></h4><h4 id="Run-shell-command-in-Jython"><a href="#Run-shell-command-in-Jython" class="headerlink" title="Run shell command in Jython"></a>Run shell command in Jython</h4><pre><code>
+package com.pynerd.example.methods;
+
+import org.python.core.PyFunction;
+import org.python.core.PyObject;
+import org.python.util.PythonInterpreter;
+import java.lang.reflect.InvocationTargetException;
+
+public class JythonDemo1 &#123;
+
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException &#123;
+        PythonInterpreter pyInter = new PythonInterpreter();
+
+        PyFunction func = pyInter.get(&quot;funcName&quot; , PyFunction.class);
+
+        func.__call__((PyObject) Class.forName(&quot;java.lang.Runtime&quot;).getMethod(&quot;exec&quot;,String.class)
+                .invoke(Class.forName(&quot;java.lang.Runtime&quot;).getMethod(&quot;getRuntime&quot;)
+                       .invoke(Class.forName(&quot;java.lang.Runtime&quot;)),&quot;open -a calculator&quot;));
+    &#125;
+&#125;
+</code></pre>
+<h4 id="Demo2"><a href="#Demo2" class="headerlink" title="Demo2"></a>Demo2</h4><pre><code>package com.pynerd.example.methods;
+
+import org.python.core.PyFunction;
+import org.python.core.PyObject;
+import org.python.util.PythonInterpreter;
+import java.lang.reflect.InvocationTargetException;
+
+public class JythonDemo2 &#123;
+
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException &#123;
+        PythonInterpreter pyInter = new PythonInterpreter();
+
+        PyFunction func = pyInter.get(&quot;funcName&quot; , PyFunction.class);
+
+ 
+        func.__tojava__((Class&lt;?&gt;) Class.forName(&quot;java.lang.Runtime&quot;).getMethod(&quot;exec&quot;,String.class)
+             .invoke(Class.forName(&quot;java.lang.Runtime&quot;).getMethod(&quot;getRuntime&quot;)
+                     .invoke(Class.forName(&quot;java.lang.Runtime&quot;)),&quot;open -a calculator&quot;));
+
+        
+    &#125;
+&#125;
+</code></pre>
+<h4 id="Demo3"><a href="#Demo3" class="headerlink" title="Demo3"></a>Demo3</h4><pre><code>package com.pynerd.example.methods;
+
+import org.python.util.PythonInterpreter;
+
+public class JythonDemo3 &#123;
+    public static void main(String[] args) &#123;
+        PythonInterpreter pyInter = new PythonInterpreter();
+            pyInter.exec(&quot;from java.lang import Runtime;\n&quot; +
+                             &quot;Runtime.getRuntime().exec(\&quot;open -a calculator\&quot;)&quot;);
+
+    &#125;
+&#125;
+</code></pre>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/11/03/Jython/">show more >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-JEP415-Context-Specific-Deserialization-Filters" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2021/10/27/JEP415-Context-Specific-Deserialization-Filters/">JEP415 - Context-Specific Deserialization Filters</a>
+    </h1>
+  
+
+        
+        <a href="/2021/10/27/JEP415-Context-Specific-Deserialization-Filters/" class="archive-article-date">
+  	<time datetime="2021-10-27T03:49:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-27</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h5 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h5><p>从Java 17开始，引入了新的安全特性（JEP 415）。与JEP 290不同的是JEP 415是针对上下文定义的Filter, 但是相同的都是在JVM层的限制，下面是官方给的概述:</p>
+<pre><code>Allow applications to configure context-specific and dynamically-selected deserialization filters via a JVM-wide filter factory that is invoked to select a filter for each individual deserialization operation.
+</code></pre>
+<h5 id="Key-Method"><a href="#Key-Method" class="headerlink" title="Key Method"></a>Key Method</h5><p><code>BinaryOperator</code></p>
+<p><code>ObjectInputFilter.allowFilter()</code></p>
+<p><code>ObjectInputFilter.rejectFilter()</code></p>
+<h5 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h5><ul>
+<li>这里存在一个<code>serialize()</code>方法和一个<code>deserialize()</code>方法，其中在<code>deserialize()</code>方法中我们使用<code>ObjectInputFilter.allowFilter()</code>方法, </li>
+</ul>
+<pre><code>package com.pynerd.example;
+
+import java.io.*;
+import java.util.function.BinaryOperator;
+
+public class JEP415 &#123;
+    public static void main(String[] args) throws IOException, ClassNotFoundException &#123;
+
+        FilterFactory filterFactory = new FilterFactory();
+        ObjectInputFilter filter  = ObjectInputFilter.rejectFilter(cl -&gt; cl.getPackageName().contentEquals(&quot;com.pynerd.example&quot;), ObjectInputFilter.Status.ALLOWED);
+        ObjectInputFilter.Config.setSerialFilter(filter);
+        ObjectInputFilter.Config.setSerialFilterFactory(filterFactory);
+
+        //Serialize Method
+        Gadget gadget = new Gadget(new Command(&quot;open -a Calculator&quot;));
+        serialize(gadget, new File(&quot;file.ser&quot;));
+        //Deserialize Method
+        deserialize(new File(&quot;file.ser&quot;));
+    &#125;
+
+    public static void serialize(Object value, File filename) throws IOException &#123;
+        System.out.println(&quot;Start Serializing.....&quot; + &quot;\r\n&quot;);
+        FileOutputStream fos = new FileOutputStream(filename);
+        ObjectOutputStream out = new ObjectOutputStream(fos);
+        out.writeObject(value);
+        out.close();
+        fos.close();
+    &#125;
+
+    public static void deserialize(File filename) throws IOException, ClassNotFoundException &#123;
+        System.out.println(&quot;Start Deserializing...&quot;);
+        FileInputStream fis = new FileInputStream(filename);
+        ObjectInputStream in = new ObjectInputStream(fis);
+        ObjectInputFilter intFilter = ObjectInputFilter.allowFilter(cl -&gt; cl.equals(Gadget.class), ObjectInputFilter.Status.ALLOWED);
+        in.setObjectInputFilter(intFilter);
+        Command cmd = (Command) in.readObject();
+        System.out.println(cmd);
+    &#125;
+
+    public static class FilterFactory implements BinaryOperator&lt;ObjectInputFilter&gt; &#123;
+        public ObjectInputFilter apply(ObjectInputFilter filter, ObjectInputFilter anotherFilter) &#123;
+            return ObjectInputFilter.merge(anotherFilter, filter);
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>当<code>main()</code>方法里定义的filter status和其它方法中定义的filter status通过<code>ObjectInputFilter.merge()</code>方法合并的时候，会取策略的交集，比如这里</p>
+<p><img src="/images/pasted-18.png" alt="upload successful"></p>
+<h5 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h5><p><a target="_blank" rel="noopener" href="https://openjdk.java.net/jeps/415">https://openjdk.java.net/jeps/415</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2021/10/27/JEP415-Context-Specific-Deserialization-Filters/">show more >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-CVE-2021-21234-Spring-Boot-Actuator-Logview-Directory-Traversal" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     

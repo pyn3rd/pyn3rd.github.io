@@ -6,28 +6,21 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://pynerd.cn">
-  <title>CVE-2021-21234 Spring Boot Actuator Logview Directory Traversal | </title>
+  <title>JEP415 - Context-Specific Deserialization Filters | </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="AbstractPrior to spring-boot-actuator-logview 0.2.13, the securityCheck() method exists in LogViewEndpoint, but the securityCheck() method only filter the .. in fileName, ignoring the security check o">
+  <meta name="description" content="Abstract从Java 17开始，引入了新的安全特性（JEP 415）。与JEP 290不同的是JEP 415是针对上下文定义的Filter, 但是相同的都是在JVM层的限制，下面是官方给的概述: Allow applications to configure context-specific and dynamically-selected deserialization filters v">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CVE-2021-21234 Spring Boot Actuator Logview Directory Traversal">
-<meta property="og:url" content="http://pynerd.cn/2021/10/25/CVE-2021-21234-Spring-Boot-Actuator-Logview-Directory-Traversal/">
+<meta property="og:title" content="JEP415 - Context-Specific Deserialization Filters">
+<meta property="og:url" content="http://pynerd.cn/2021/10/27/JEP415-Context-Specific-Deserialization-Filters/">
 <meta property="og:site_name">
-<meta property="og:description" content="AbstractPrior to spring-boot-actuator-logview 0.2.13, the securityCheck() method exists in LogViewEndpoint, but the securityCheck() method only filter the .. in fileName, ignoring the security check o">
+<meta property="og:description" content="Abstract从Java 17开始，引入了新的安全特性（JEP 415）。与JEP 290不同的是JEP 415是针对上下文定义的Filter, 但是相同的都是在JVM层的限制，下面是官方给的概述: Allow applications to configure context-specific and dynamically-selected deserialization filters v">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://pynerd.cn/images/pasted-7.png">
-<meta property="og:image" content="http://pynerd.cn/images/pasted-8.png">
-<meta property="og:image" content="http://pynerd.cn/images/pasted-12.png">
-<meta property="og:image" content="http://pynerd.cn/images/pasted-13.png">
-<meta property="og:image" content="http://pynerd.cn/images/pasted-14.png">
-<meta property="og:image" content="http://pynerd.cn/images/pasted-15.png">
-<meta property="og:image" content="http://pynerd.cn/images/pasted-16.png">
-<meta property="og:image" content="http://pynerd.cn/images/pasted-17.png">
-<meta property="article:published_time" content="2021-10-25T06:28:19.000Z">
-<meta property="article:modified_time" content="2021-10-25T08:20:53.316Z">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-18.png">
+<meta property="article:published_time" content="2021-10-27T03:49:01.000Z">
+<meta property="article:modified_time" content="2021-10-27T09:29:51.036Z">
 <meta property="article:author" content="pyn3rd">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://pynerd.cn/images/pasted-7.png">
+<meta name="twitter:image" content="http://pynerd.cn/images/pasted-18.png">
   
     <link rel="alternative" href="/atom.xml" title="" type="application/atom+xml">
   
@@ -145,43 +138,84 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-CVE-2021-21234-Spring-Boot-Actuator-Logview-Directory-Traversal" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-JEP415-Context-Specific-Deserialization-Filters" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      CVE-2021-21234 Spring Boot Actuator Logview Directory Traversal
+      JEP415 - Context-Specific Deserialization Filters
     </h1>
   
 
         
-        <a href="/2021/10/25/CVE-2021-21234-Spring-Boot-Actuator-Logview-Directory-Traversal/" class="archive-article-date">
-  	<time datetime="2021-10-25T06:28:19.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-25</time>
+        <a href="/2021/10/27/JEP415-Context-Specific-Deserialization-Filters/" class="archive-article-date">
+  	<time datetime="2021-10-27T03:49:01.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-27</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h5 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h5><p>Prior to spring-boot-actuator-logview 0.2.13, the <code>securityCheck()</code> method exists in <code>LogViewEndpoint</code>, but the <code>securityCheck()</code> method only filter the <code>..</code> in <code>fileName</code>, ignoring the security check of <code>basePath</code>, so the attacker can construct payload with the evasion of check in <code>basePath</code>.</p>
-<h5 id="Review"><a href="#Review" class="headerlink" title="Review"></a>Review</h5><p>Start up tomcat server of SpringBoot project, if the page looks like this, it means SpringBoot Actutor Logview works well.</p>
-<p><img src="/images/pasted-7.png" alt="upload successful"></p>
-<p>Set break piont at <code>securityCheck()</code> meanwhile sending a HTTP request with the PoC <code>http://localhost:8887/manage/log/view?filename=/etc/passwd&amp;base=../../../../../</code>, then you will step into the screenshot as follow</p>
-<p><img src="/images/pasted-8.png" alt="upload successful"></p>
-<p><img src="/images/pasted-12.png" alt="upload successful"></p>
-<p>Firstly step into <code>lggingPath()</code></p>
-<p><img src="/images/pasted-13.png" alt="upload successful"></p>
-<p>Then step into <code>streamContent</code>,<br>here you can see <code>spring.log/../../../../../</code> as folder, and <code>/etc/passwd</code> is the file we want to read.</p>
-<p><img src="/images/pasted-14.png" alt="upload successful"></p>
-<p>Next step into <code>toFile()</code> method , the folder <code>spring.log/../../../../../</code> and the file <code>/etc/passwd</code> will be concated as the final path without secrity check any more.</p>
-<p><img src="/images/pasted-15.png" alt="upload successful"></p>
-<p>Consequently you can retreive the content of file <code>/etc/passwd</code></p>
-<p><img src="/images/pasted-16.png" alt="upload successful"></p>
-<h5 id="Proof-of-Concept"><a href="#Proof-of-Concept" class="headerlink" title="Proof of Concept"></a>Proof of Concept</h5><p><code>http://localhost:8887/manage/log/view?filename=/etc/passwd&amp;base=../../../../../</code></p>
-<h5 id="Fix"><a href="#Fix" class="headerlink" title="Fix"></a>Fix</h5><p>From spring-boot-actuator-logview 0.2.13, <code>basePath</code> has strict security check, the path traversal is not permitted any more.<br><img src="/images/pasted-17.png" alt="upload successful"></p>
-<h5 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h5><p><a target="_blank" rel="noopener" href="https://github.com/lukashinsch/spring-boot-actuator-logview/commit/760acbb939a8d1f7d1a7dfcd51ca848eea04e772">https://github.com/lukashinsch/spring-boot-actuator-logview/commit/760acbb939a8d1f7d1a7dfcd51ca848eea04e772</a></p>
+        <h5 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h5><p>从Java 17开始，引入了新的安全特性（JEP 415）。与JEP 290不同的是JEP 415是针对上下文定义的Filter, 但是相同的都是在JVM层的限制，下面是官方给的概述:</p>
+<pre><code>Allow applications to configure context-specific and dynamically-selected deserialization filters via a JVM-wide filter factory that is invoked to select a filter for each individual deserialization operation.
+</code></pre>
+<h5 id="Key-Method"><a href="#Key-Method" class="headerlink" title="Key Method"></a>Key Method</h5><p><code>BinaryOperator</code></p>
+<p><code>ObjectInputFilter.allowFilter()</code></p>
+<p><code>ObjectInputFilter.rejectFilter()</code></p>
+<h5 id="Demo"><a href="#Demo" class="headerlink" title="Demo"></a>Demo</h5><ul>
+<li>这里存在一个<code>serialize()</code>方法和一个<code>deserialize()</code>方法，其中在<code>deserialize()</code>方法中我们使用<code>ObjectInputFilter.allowFilter()</code>方法, </li>
+</ul>
+<pre><code>package com.pynerd.example;
+
+import java.io.*;
+import java.util.function.BinaryOperator;
+
+public class JEP415 &#123;
+    public static void main(String[] args) throws IOException, ClassNotFoundException &#123;
+
+        FilterFactory filterFactory = new FilterFactory();
+        ObjectInputFilter filter  = ObjectInputFilter.rejectFilter(cl -&gt; cl.getPackageName().contentEquals(&quot;com.pynerd.example&quot;), ObjectInputFilter.Status.ALLOWED);
+        ObjectInputFilter.Config.setSerialFilter(filter);
+        ObjectInputFilter.Config.setSerialFilterFactory(filterFactory);
+
+        //Serialize Method
+        Gadget gadget = new Gadget(new Command(&quot;open -a Calculator&quot;));
+        serialize(gadget, new File(&quot;file.ser&quot;));
+        //Deserialize Method
+        deserialize(new File(&quot;file.ser&quot;));
+    &#125;
+
+    public static void serialize(Object value, File filename) throws IOException &#123;
+        System.out.println(&quot;Start Serializing.....&quot; + &quot;\r\n&quot;);
+        FileOutputStream fos = new FileOutputStream(filename);
+        ObjectOutputStream out = new ObjectOutputStream(fos);
+        out.writeObject(value);
+        out.close();
+        fos.close();
+    &#125;
+
+    public static void deserialize(File filename) throws IOException, ClassNotFoundException &#123;
+        System.out.println(&quot;Start Deserializing...&quot;);
+        FileInputStream fis = new FileInputStream(filename);
+        ObjectInputStream in = new ObjectInputStream(fis);
+        ObjectInputFilter intFilter = ObjectInputFilter.allowFilter(cl -&gt; cl.equals(Gadget.class), ObjectInputFilter.Status.ALLOWED);
+        in.setObjectInputFilter(intFilter);
+        Command cmd = (Command) in.readObject();
+        System.out.println(cmd);
+    &#125;
+
+    public static class FilterFactory implements BinaryOperator&lt;ObjectInputFilter&gt; &#123;
+        public ObjectInputFilter apply(ObjectInputFilter filter, ObjectInputFilter anotherFilter) &#123;
+            return ObjectInputFilter.merge(anotherFilter, filter);
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>当<code>main()</code>方法里定义的filter status和其它方法中定义的filter status通过<code>ObjectInputFilter.merge()</code>方法合并的时候，会取策略的交集，比如这里</p>
+<p><img src="/images/pasted-18.png" alt="upload successful"></p>
+<h5 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h5><p><a target="_blank" rel="noopener" href="https://openjdk.java.net/jeps/415">https://openjdk.java.net/jeps/415</a></p>
 
       
 
@@ -224,18 +258,18 @@
   
 <nav id="article-nav">
   
-    <a href="/2021/10/27/JEP415-Context-Specific-Deserialization-Filters/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2021/11/03/Jython/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          JEP415 - Context-Specific Deserialization Filters
+          Jython
         
       </div>
     </a>
   
   
-    <a href="/2021/10/22/mysql-jdbc-xxe/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">CVE-2021-2471 MySQL JDBC XXE</div>
+    <a href="/2021/10/25/CVE-2021-21234-Spring-Boot-Actuator-Logview-Directory-Traversal/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">CVE-2021-21234 Spring Boot Actuator Logview Directory Traversal</div>
       <i class="icon-circle-right"></i>
     </a>
   
