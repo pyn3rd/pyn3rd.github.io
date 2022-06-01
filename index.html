@@ -134,6 +134,103 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Arbitrary-File-Upload-Tricks-In-Java" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/05/07/Arbitrary-File-Upload-Tricks-In-Java/">Arbitrary File Upload Tricks In Java </a>
+    </h1>
+  
+
+        
+        <a href="/2022/05/07/Arbitrary-File-Upload-Tricks-In-Java/" class="archive-article-date">
+  	<time datetime="2022-05-07T04:05:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-05-07</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h5 id="0x01-Forewords"><a href="#0x01-Forewords" class="headerlink" title="0x01 Forewords"></a>0x01 Forewords</h5><p>Recently I see some discussions about arbitrary file upload in Java environment on Internet. The main takling points are how to bypass file name detection when uploading arbitrary file.</p>
+<p>Consequently I write this article to summerize the tricks.</p>
+<h5 id="0x02-Juicy-Tricks"><a href="#0x02-Juicy-Tricks" class="headerlink" title="0x02 Juicy Tricks"></a>0x02 Juicy Tricks</h5><ul>
+<li>Use <code>getSubmittedFileName</code> method to obtain file name </li>
+</ul>
+<p>When we use original <code>Servlet</code> to develop a multipart format file upload feature in Java, <code>getSubmittedFileName()</code> method is often utilized to obtain the file name, especially in early Java applications. But a potential problem involving this method.</p>
+<p>We can debug the code to analyse it.Firstly set the breakpoint at <code>getSubmittedFileName</code> , then step into the next method named <code>HttpParser.unquote()</code>, here is the place which file name is obtained.</p>
+<p><img src="/images/pasted-95.png" alt="upload successful"></p>
+<p>During debugging the code, we can find that when file name containing <code>\</code> , it will be omitted. Finally the file name becomes <code>pyn3rd.jsp</code></p>
+<p><img src="/images/pasted-96.png" alt="upload successful"></p>
+<p>So we can use this peculiarity to evade file name detection，like  regular expression based WAF.</p>
+<p><img src="/images/pasted-97.png" alt="upload successful"></p>
+<ul>
+<li>Use <code>getOriginalFilename</code> method to obtain file name </li>
+</ul>
+<p>As we know, the scenario of multipart format file upload in SpringBoot, we are used to utilize <code>getOriginalFilename()</code> method to obtain file name,<br>it can obtain file name directly without any file name changes.</p>
+<p><img src="/images/pasted-98.png" alt="upload successful"></p>
+<p><img src="/images/pasted-99.png" alt="upload successful"></p>
+<p>However, when we use another method named <code>StringUtils.cleanPath()</code> to normalize the file name which <code>getOriginalFilename()</code> method obtains, another peculiarity existing. We can use one or more <code>/.</code> to append the file name.</p>
+<p><code>/</code> is used as a delimiter and <code>.</code> means the current directory. If it points to current directory,just drop it. So the result of the file name is <code>pyn3rd.jsp</code></p>
+<p><img src="/images/pasted-100.png" alt="upload successful"></p>
+<p><img src="/images/pasted-101.png" alt="upload successful"></p>
+<p>By the way, in Java (both Windows and Linux), <code>\</code> is always transformed to <code>/</code>, when we encounter SSRF/XXE vulnerablities, trying to replace <code>\</code> with <code>/</code>, for example, <code>http:\/</code> replaces <code>http://</code></p>
+<p><img src="/images/pasted-102.png" alt="upload successful"></p>
+<ul>
+<li>Use <code>Apache commons-fileupload/commons-io</code> method to obtain file name </li>
+</ul>
+<p>We can also use some common Java libraries like <code>org.apache.commons.fileupload.FileItem.getName</code> or  <code>org.apache.commons.io.FilenameUtils.getName</code> to obtain file name. For example,<code>commons-io</code> is analyzed as follow</p>
+<p><img src="/images/pasted-103.png" alt="upload successful"></p>
+<p>If <code>/</code> or <code>/[SPACE]</code> is appended at the end of the file name. In the other words, <code>/</code> with zero character or null character, the results of the file name are both <code>pyn3rd.jsp</code></p>
+<p><img src="/images/pasted-104.png" alt="upload successful"></p>
+<p><img src="/images/pasted-105.png" alt="upload successful"></p>
+<p><img src="/images/pasted-106.png" alt="upload successful"></p>
+<p>If <code>/</code> or <code>/[SPACE]</code> is appended at the end of the file name.In case of the non-blank characters existing behind the delimiter <code>/</code>,<br>the characters behind <code>/</code> will be obtained as the file name. </p>
+<p><img src="/images/pasted-107.png" alt="upload successful"></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2022/05/07/Arbitrary-File-Upload-Tricks-In-Java/">show more >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-PostgreSQL-driver" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
