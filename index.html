@@ -254,10 +254,10 @@
 <p><img src="/images/pasted-160.png" alt="upload successful"></p>
 <h6 id="ModeShape-RCE-with-JDBC-Driver"><a href="#ModeShape-RCE-with-JDBC-Driver" class="headerlink" title="ModeShape RCE with JDBC Driver"></a>ModeShape RCE with JDBC Driver</h6><p><code>ModeShape</code> is a lightweight, fast, and pluggable JCR repository that federates and unifies content from multiple systems, including files systems, databases, configuration files, other repositories, services, applications, and data grids. </p>
 <p><img src="/images/pasted-152.png" alt="upload successful"></p>
-<p>The full name of JCR is Content Repository API for Java is a specification for a Java platform application programming interface API to access content repositories in a uniform manner.Using the JCR API, you can get data from a variety of different systems, including file systems, relational databases and so on.</p>
+<p>The full name of JCR is Content Repository API for Java is a specification for a Java platform application programming interface API to access content repositories in a uniform manner. Using the JCR API, you can get data from a variety of different systems, including file systems, relational databases and so on.</p>
 <p><img src="/images/pasted-153.png" alt="upload successful"></p>
 <p>A standard JCR connection for ModeShape is in the format shown bellow, which requires <code>repositoryName</code> to make a connection to an existing repository. In this way, the JNDI string in the connection URL gets our attention, and we reasonably assume that in addition to supporting the JCR protocol, other protocols such as LDAP should also be supported. </p>
-<p><img src="/images/pasted-163.png" alt="upload successful"></p>
+<p><img src="/images/pasted-203.png" alt="upload successful"></p>
 <p>After futher testing, it turns out that we can indeed initiate a JNDI lookup request to a specified LDAP server, so this is another typical JNDI injection vulnerability.</p>
 <p><img src="/images/pasted-164.png" alt="upload successful"></p>
 <h6 id="Apache-Derby-with-JDBC-Driver"><a href="#Apache-Derby-with-JDBC-Driver" class="headerlink" title="Apache Derby with JDBC Driver"></a>Apache Derby with JDBC Driver</h6><p>Apache Derby is an open source relational database implemented entirely in java. It can be used as an embedded database just like H2 database. With embedded databases, it is usually easier to implement attacks because the server and client can exist in the same project. </p>
