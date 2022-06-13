@@ -33,7 +33,6 @@
 <meta property="og:image" content="http://pynerd.cn/images/pasted-146.png">
 <meta property="og:image" content="http://pynerd.cn/images/pasted-148.png">
 <meta property="og:image" content="http://pynerd.cn/images/pasted-147.png">
-<meta property="og:image" content="http://pynerd.cn/images/pasted-206.png">
 <meta property="og:image" content="http://pynerd.cn/images/pasted-161.png">
 <meta property="og:image" content="http://pynerd.cn/images/pasted-162.png">
 <meta property="og:image" content="http://pynerd.cn/images/pasted-165.png">
@@ -74,7 +73,7 @@
 <meta property="og:image" content="http://pynerd.cn/images/pasted-197.png">
 <meta property="og:image" content="http://pynerd.cn/images/pasted-198.png">
 <meta property="article:published_time" content="2022-06-06T09:35:53.000Z">
-<meta property="article:modified_time" content="2022-06-13T16:05:10.608Z">
+<meta property="article:modified_time" content="2022-06-13T16:20:52.859Z">
 <meta property="article:author" content="pyn3rd">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://pynerd.cn/images/pasted-131.png">
@@ -297,9 +296,7 @@
 <p>Finally we can execute malicious java code in assertions.</p>
 <p><img src="/images/pasted-147.png" alt="upload successful"></p>
 <p>However, in the real world, Groovy dependencies are not built into H2 database environment. So this attack depends on whether Groovy components are included into the application. Obviously it does not make sense.</p>
-<p>So we continue to look for another way to attack, reviewing the source code, we quickly discover that in addition to the <code>CREATE ALIAS AS</code>  sentence, there is another sentence can input a customized source code. In the parsing of the <code>CREATE Trigger</code> statement, finally, we can call <code>loadFromSource</code> method of the <code>TriggerObject</code> class. </p>
-<p><img src="/images/pasted-206.png" alt="upload successful"></p>
-<p>We are pleasantly surprised to find that in this method, the javascript source code is not only compiled but also executed. As the source code showing, it calls the <code>eval()</code> method directly. And since <code>ScriptEngine</code> is finally used for execution with no sandbox implement, we could input any java class fragment we wanted in javascript. So with this, we can easily achieve the purpose of RCE without the <code>CALL</code> or other sentences.</p>
+<p>So we continue to look for another way to attack, reviewing the source code, we quickly discover that in addition to the <code>CREATE ALIAS AS</code>  sentence, there is another sentence can input a customized source code. In the parsing of the <code>CREATE Trigger</code> statement, finally, we can call <code>loadFromSource</code> method of the <code>TriggerObject</code> class. We are pleasantly surprised to find that in this method, the javascript source code is not only compiled but also executed. As the source code showing, it calls the <code>eval()</code> method directly. And since <code>ScriptEngine</code> is finally used for execution with no sandbox implement, we could input any java class fragment we wanted in javascript. So with this, we can easily achieve the purpose of RCE without the <code>CALL</code> or other sentences.</p>
 <p><img src="/images/pasted-161.png" alt="upload successful"></p>
 <p>As the PoC shows,JavaScript scripts start with JavaScript comments, and then we can then simply use <code>java.lang.Runtime.getRuntime().exec()</code> method to achieve RCE.</p>
 <p><img src="/images/pasted-162.png" alt="upload successful"></p>
