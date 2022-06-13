@@ -161,12 +161,12 @@
 <li>Send queries and update statements to the database</li>
 <li>Retrieve and process the results received from the database in answer to your query</li>
 </ul>
-<p>Actually, JDBC is a set of standard interfaces and a particular relational database has its own implement,like <code>JDBCMysqlImpl</code> in MySQL JDBC driver.I draw the following picture to describe these implements.</p>
+<p>Actually, JDBC is a set of standard interfaces and a particular relational database has its own implement, like <code>JDBCMysqlImpl</code> in MySQL JDBC driver. I draw the following picture to describe these implements.</p>
 <p><img src="/images/pasted-131.png" alt="upload successful"></p>
 <p>It is mainly in the <code>java.sql</code> package in JDK, JDBC drivers are client-side adapters , installed in the client endpoint, not in the server side. It can convert requests from Java programs to a protocol that the DBMS can understand.JDBC drivers provide JDBC specific implementations for different databases . For developers, JDBC helps shield the specifics of individual databases.</p>
 <p>The following simple code fragment gives an example.</p>
 <p><img src="/images/pasted-132.png" alt="upload successful"></p>
-<p>The short code fragment instantiates a DriverManager object to connect to a database driver and log into the database. It occured to me that if the JDBC URL is under control, what will take place?</p>
+<p>The short code fragment instantiates a <code>DriverManager</code> object to connect to a database driver and log into the database. It occured to me that if the JDBC URL is under control, what will take place?</p>
 <p>According to the above picture, the basic attack assumptive steps are as follow:</p>
 <ul>
 <li><p>Sets a malicious JDBC URL and triggers the JDBC connection. </p>
@@ -176,20 +176,22 @@
 <li><p>Take advantage of the security flaws or some particular properties of the JDBC drivers to trigger these vulnerabilities.</p>
 </li>
 </ul>
-<p>Before my new research, I focus on some disclosed cases.So starting with the in-depth analysis of the historical vulnerablities.</p>
-<h5 id="0x03-Review-Historical-Issues"><a href="#0x03-Review-Historical-Issues" class="headerlink" title="0x03 Review Historical Issues"></a>0x03 Review Historical Issues</h5><h6 id="MySQL-Client-Arbitrary-File-Reading-Vulnerability"><a href="#MySQL-Client-Arbitrary-File-Reading-Vulnerability" class="headerlink" title="MySQL Client Arbitrary File Reading Vulnerability"></a>MySQL Client Arbitrary File Reading Vulnerability</h6><p>This vulnerability is caused by the existed MySQL feature for a long time. The feature is that the Load Data Local Infile statement can read client files and send them to the server. There is no doubt that this feature is very risky, and the MySQL official document clearly states that clients should not connect to any untrusted server. </p>
-<p>But the truth is that it’s always hard to be sure. And since this is the specification of MySQL, it can affect most clients, including the MySQL JDBC driver. An attacker can forge a malicious MySQL server and after the client connects, the client will sends some initializing query packets such as send query to <code>SET NAMES</code> charset <code>utf-8</code>, then the malicious server can send a file transfer packet specifying to read any file from the client.</p>
+<p>Before my new research, I focus on some disclosed cases. So it starts with the in-depth analysis of the historical vulnerablities.</p>
+<h5 id="0x03-Review-Historical-Issues"><a href="#0x03-Review-Historical-Issues" class="headerlink" title="0x03 Review Historical Issues"></a>0x03 Review Historical Issues</h5><h6 id="MySQL-Client-Arbitrary-File-Reading-Vulnerability"><a href="#MySQL-Client-Arbitrary-File-Reading-Vulnerability" class="headerlink" title="MySQL Client Arbitrary File Reading Vulnerability"></a>MySQL Client Arbitrary File Reading Vulnerability</h6><p>This vulnerability is caused by the existed MySQL feature for a long time. The feature is that the <code>Load Data Local Infile</code> statement can read client files and send them to the server. There is no doubt that this feature is very risky. The MySQL official document clearly states that clients should not connect to any untrusted server. </p>
+<p>To tell the truth, is that it’s always hard to make sure. And since this is the specification of MySQL, it can affect most clients, including the MySQL JDBC driver. An attacker can forge a malicious MySQL server and after the client connecting, the client will send some initializing query packets such as sending query to <code>SET NAMES</code> with charset <code>utf-8</code>, then the malicious server can send a file transfer packet specifying to read any file from the client.</p>
 <p><img src="/images/pasted-133.png" alt="upload successful"></p>
 <h6 id="MySQL-JDBC-Client-Deserialization-Vulnerability"><a href="#MySQL-JDBC-Client-Deserialization-Vulnerability" class="headerlink" title="MySQL JDBC Client Deserialization Vulnerability"></a>MySQL JDBC Client Deserialization Vulnerability</h6><p>Actually the MySQL JDBC deserialization vulnerability was firstly mentioned by <code>Thijs Alkemade</code> in 2017. </p>
 <p><img src="/images/pasted-135.png" alt="upload successful"></p>
-<p>This report named <code>Unexpected automatic deserialisation of Java objects</code> was assinged as CVE-2017-3523 eventually.The details of the issue are as follows.</p>
-<p><a target="_blank" rel="noopener" href="https://www.computest.nl/advisories/CT-2017-0425_MySQL-Connector-J.txt">https://www.computest.nl/advisories/CT-2017-0425_MySQL-Connector-J.txt</a></p>
-<p>Until in 2019, some new research are disclosed by <code>ZhangYang</code> and his team mates. They made a presentation named <code>&lt;New Exploit Technique In Java Deserialization Attack&gt;</code> in Black Hat Europe.When MySQL JDBC directly deserializes certain types of data returned by the server, It can result in RCE if gadgets are appropriate.</p>
+<p>This report named <code>Unexpected automatic deserialisation of Java objects</code> was assinged as CVE-2017-3523 eventually. Until 2019, a further research is disclosed by <code>ZhangYang</code> and his team mates. They made a presentation named <code>&lt;New Exploit Technique In Java Deserialization Attack&gt;</code> in Black Hat Europe. When MySQL JDBC directly deserializes certain types of data returned from the server, It can result in a remote code execution if the gadgets are appropriate.</p>
 <p><img src="/images/pasted-200.png" alt="upload successful"></p>
-<p>Using the <code>statementInterceptors</code> property provided by the JDBC driver, you can set an interceptor to perform additional operations before or after the certain kinds of statements.The full attacking chains are that</p>
-<p>Firstly, set the <code>statementInterceptor</code> attribute to <code>ServerStatusDiffInterceptor</code>, auditing <code>ServerStatusDiffInterceptor</code> code, you can see that this interceptor allows the client to send specific queries to the server, In addition, the <code>getObject</code> method is used to process the returned column. </p>
+<p>Using the <code>statementInterceptors</code> property provided by the JDBC driver, you can set an interceptor to perform additional operations before or after the certain kinds of statements. The full attacking chains are as follows</p>
+<ul>
+<li>Firstly, set the <code>statementInterceptor</code> attribute to <code>ServerStatusDiffInterceptor</code>, auditing <code>ServerStatusDiffInterceptor</code> code, you can see that this interceptor allows the client to send specific queries to the server, In addition, the <code>getObject</code> method is used to process the returned column. </li>
+</ul>
 <p><img src="/images/pasted-201.png" alt="upload successful"></p>
-<p>In the <code>getObject</code> method, the driver will directly call the <code>readObject</code> method for deserialization of binary and blob types. Therefore, the server side controlled by the attacker can trigger deserialization vulnerabilities as long as it returns falsified serialized data.</p>
+<ul>
+<li>Secondly, in the <code>getObject</code> method, the driver will directly call the <code>readObject</code> method for deserialization of binary and blob types. Therefore, the server side controlled by the attacker can trigger deserialization vulnerabilities as long as it returns falsified serialized data.</li>
+</ul>
 <p><img src="/images/pasted-202.png" alt="upload successful"></p>
 <p>Of course, the class and property names of interceptors are different in various version of JDBC driver as shown in the table.</p>
 <p><img src="/images/pasted-137.png" alt="upload successful"></p>
