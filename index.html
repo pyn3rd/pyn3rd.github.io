@@ -213,7 +213,7 @@
 </code></pre>
 <p>When the administrator clicks the link of the above HTML page, the remote code will executed. I reported the bugs to Oracle. Then CVE number are assigned as <code>CVE-2020-2869, CVE-2020-2934</code>.</p>
 <p><img src="/images/pasted-140.png" alt="upload successful"></p>
-<h6 id="SpringBoot-H2-Console-RCE-with-JDBC-Driver"><a href="#SpringBoot-H2-Console-RCE-with-JDBC-Driver" class="headerlink" title="SpringBoot H2 Console RCE with JDBC Driver"></a>SpringBoot H2 Console RCE with JDBC Driver</h6><p>When SpringBoot H2 database console is enabled, we can access the endpoit <code>/h2-console/</code> to administrate the H2 databse with a web page. </p>
+<h6 id="SpringBoot-H2-Console-RCE-with-JDBC-Driver"><a href="#SpringBoot-H2-Console-RCE-with-JDBC-Driver" class="headerlink" title="SpringBoot H2 Console RCE with JDBC Driver"></a>SpringBoot H2 Console RCE with JDBC Driver</h6><p>When SpringBoot H2 database console is enabled, we can access the endpoit <code>/h2-console/</code> to administrate the H2 database with a web page. </p>
 <p>However,the JDBC URL of H2 database is on supportive of the <code>INIT</code> parameter. It can be utilized to execute an initialization SQL sentence, meanwhile, an external SQL script can be imported by <code>RUNSCRIPT FROM</code>. </p>
 <p><img src="/images/pasted-141.png" alt="upload successful"></p>
 <p>Here is the illustration in SpringBoot H2 console</p>
