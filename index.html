@@ -740,8 +740,10 @@ public class WeblogicOJDBC &#123;
 <p><img src="/images/pasted-95.png" alt="upload successful"></p>
 <p>During debugging the code, we can find that when file name containing <code>\</code> , it will be omitted. Finally the file name becomes <code>pyn3rd.jsp</code></p>
 <p><img src="/images/pasted-96.png" alt="upload successful"></p>
-<p>So we can use this peculiarity to evade file name detection，like  regular expression based WAF.</p>
+<p>So we can use this peculiarity to evade file name detection，like regular expression based WAF.</p>
 <p><img src="/images/pasted-97.png" alt="upload successful"></p>
+<p>Significantly, we also can use one single <code>&quot;</code> in <code>filename</code> parameter value with one characters appended to file extension and one <code>\</code> in filename.</p>
+<p><img src="/images/pasted-222.png" alt="upload successful"></p>
 <ul>
 <li>Use <code>getOriginalFilename</code> method to obtain file name </li>
 </ul>
@@ -752,7 +754,7 @@ public class WeblogicOJDBC &#123;
 <p><code>/</code> is used as a delimiter and <code>.</code> means the current directory. If it points to current directory,just drop it. So the result of the file name is <code>pyn3rd.jsp</code></p>
 <p><img src="/images/pasted-100.png" alt="upload successful"></p>
 <p><img src="/images/pasted-101.png" alt="upload successful"></p>
-<p>By the way, in Java (both Windows and Linux), <code>\</code> is always transformed to <code>/</code>, when we encounter SSRF/XXE vulnerablities, trying to replace <code>\</code> with <code>/</code>, for example, <code>http:\/</code> replaces <code>http://</code></p>
+<p>By the way, in Java (Windows system), <code>\</code> is always transformed to <code>/</code>, when we encounter SSRF/XXE vulnerablities, trying to replace <code>\</code> with <code>/</code>, for example, <code>http:\/</code> replaces <code>http://</code></p>
 <p><img src="/images/pasted-102.png" alt="upload successful"></p>
 <ul>
 <li>Use <code>Apache commons-fileupload/commons-io</code> method to obtain file name </li>
