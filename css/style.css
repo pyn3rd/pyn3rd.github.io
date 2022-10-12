@@ -1516,70 +1516,74 @@ article .content .caption {
   color: #000;
   background: #fff;
 }
+.highlight .code .subst,
+.highlight .code .title {
+  font-weight: normal;
+  color: #000;
+}
 .highlight .code .comment,
 .highlight .code .quote {
-  color: #006a00;
+  color: #808080;
+  font-style: italic;
 }
+.highlight .code .meta {
+  color: #808000;
+}
+.highlight .code .tag {
+  background: #efefef;
+}
+.highlight .code .section,
+.highlight .code .name,
+.highlight .code .literal,
 .highlight .code .keyword,
 .highlight .code .selector-tag,
-.highlight .code .literal {
-  color: #aa0d91;
+.highlight .code .type,
+.highlight .code .selector-id,
+.highlight .code .selector-class {
+  font-weight: bold;
+  color: #000080;
 }
-.highlight .code .name {
-  color: #008;
+.highlight .code .attribute,
+.highlight .code .number,
+.highlight .code .regexp,
+.highlight .code .link {
+  font-weight: bold;
+  color: #00f;
+}
+.highlight .code .number,
+.highlight .code .regexp,
+.highlight .code .link {
+  font-weight: normal;
+}
+.highlight .code .string {
+  color: #008000;
+  font-weight: bold;
+}
+.highlight .code .symbol,
+.highlight .code .bullet,
+.highlight .code .formula {
+  color: #000;
+  background: #d0eded;
+  font-style: italic;
+}
+.highlight .code .doctag {
+  text-decoration: underline;
 }
 .highlight .code .variable,
 .highlight .code .template-variable {
-  color: #660;
-}
-.highlight .code .string {
-  color: #c41a16;
-}
-.highlight .code .regexp,
-.highlight .code .link {
-  color: #080;
-}
-.highlight .code .title,
-.highlight .code .tag,
-.highlight .code .symbol,
-.highlight .code .bullet,
-.highlight .code .number,
-.highlight .code .meta {
-  color: #1c00cf;
-}
-.highlight .code .section,
-.highlight .code .class .title,
-.highlight .code .type,
-.highlight .code .attr,
-.highlight .code .built_in,
-.highlight .code .builtin-name,
-.highlight .code .params {
-  color: #5c2699;
-}
-.highlight .code .attribute,
-.highlight .code .subst {
-  color: #000;
-}
-.highlight .code .formula {
-  background-color: #eee;
-  font-style: italic;
+  color: #660e7a;
 }
 .highlight .code .addition {
-  background-color: #baeeba;
+  background: #baeeba;
 }
 .highlight .code .deletion {
-  background-color: #ffc8bd;
-}
-.highlight .code .selector-id,
-.highlight .code .selector-class {
-  color: #9b703f;
-}
-.highlight .code .doctag,
-.highlight .code .strong {
-  font-weight: bold;
+  background: #ffc8bd;
 }
 .highlight .code .emphasis {
   font-style: italic;
+}
+.highlight .code .strong {
+  font-weight: bold;
 }
 pre {
   overflow-x: auto;
