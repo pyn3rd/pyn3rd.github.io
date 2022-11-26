@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="0x01 PrefaceLast week, I saw an interesting case about JDBC attack reported by @JJaaskela in HackerOne. It caught my attention, so I intended to analyse this case.  Here is the link of this report: ht">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack">
+<meta property="og:url" content="http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/index.html">
+<meta property="og:site_name">
+<meta property="og:description" content="0x01 PrefaceLast week, I saw an interesting case about JDBC attack reported by @JJaaskela in HackerOne. It caught my attention, so I intended to analyse this case.  Here is the link of this report: ht">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://yoursite.com/images/pasted-230.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-231.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-232.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-233.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-234.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-235.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-236.png">
+<meta property="article:published_time" content="2022-11-15T03:18:46.000Z">
+<meta property="article:modified_time" content="2022-11-26T03:02:51.315Z">
+<meta property="article:author" content="by pyn3rd">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/pasted-230.png">
+<meta name="twitter:creator" content="@pyn3rd">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/atom.xml" title="" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2022/06/29/Amazon-Redshift-JDBC-Driver-Trick/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&text=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&is_video=false&description=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack&body=Check out this article: http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&name=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&t=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#0x01-Preface"><span class="toc-number">1.</span> <span class="toc-text">0x01 Preface</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Loading-class"><span class="toc-number">2.</span> <span class="toc-text">Loading class</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x02-About-Jolokia"><span class="toc-number">3.</span> <span class="toc-text">0x02 About Jolokia</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x03-JVMTI-amp-Instrument"><span class="toc-number">4.</span> <span class="toc-text">0x03 JVMTI &amp; Instrument</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x04-Create-malicious-Jar-file"><span class="toc-number">5.</span> <span class="toc-text">0x04 Create malicious Jar file</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Inject-malicious-jar-file-stream-into-database-file"><span class="toc-number">6.</span> <span class="toc-text">Inject malicious jar file stream into database file</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Final-Inllustration"><span class="toc-number">7.</span> <span class="toc-text">Final Inllustration</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">by pyn3rd</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-11-15T03:18:46.000Z" itemprop="datePublished">2022-11-15</time>
+        
+        (Updated: <time datetime="2022-11-26T03:02:51.315Z" itemprop="dateModified">2022-11-26</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h5 id="0x01-Preface"><a href="#0x01-Preface" class="headerlink" title="0x01 Preface"></a>0x01 Preface</h5><p>Last week, I saw an interesting case about JDBC attack reported by @JJaaskela in HackerOne. It caught my attention, so I intended to analyse this case.</p>
+<p><img src="/images/pasted-230.png" alt="upload successful"></p>
+<p>Here is the link of this report:</p>
+<p><a href="https://hackerone.com/reports/1547877">https://hackerone.com/reports/1547877</a></p>
+<p>Due to the bug fix, I cannot reproduce the vulnerablity. But I still can obtain some clues according to the description of this report.</p>
+<p>Aiven is a next-generation managed cloud database service that hosts your software infrastructure services. It supports diverse kinds of data sources, like Apache Kafka, PostgresSQL, MySQL, Redis, etc. Obviously, JDBC connections exist in these scenarios.</p>
+<p>The root causes of this vulnerablity are as follow:</p>
+<ul>
+<li><p>The reporter found the service supported Jolokia service according to the logs in web console, and the HTTP sink connector allowed user to send HTTP request to localhost, Jolokia service was listening on <code>localhost:6725</code> as well.</p>
+</li>
+<li><p>JMX exposes the Mbean called <code>com.sun.management:type=DiagnosticCommand</code>, it has a special operation named <code>jvmtiAgentLoad</code>.</p>
+</li>
+<li><p>The HTTP Sink Connector did not verify the data source target whether or not a local resource, so we can utilized the operation <code>jvmtiAgentLoad</code> to load a local jar file. In this case the jar file is the SQLite database file.</p>
+</li>
+</ul>
+<h5 id="Loading-class"><a href="#Loading-class" class="headerlink" title="Loading class"></a>Loading class</h5><p>As we know, we can use different ClassLoaders to load java classes from diverse origins. The main origins as follow:</p>
+<ol>
+<li><p>Loading .class file from local system directly, which is the loading method of most classes.</p>
+</li>
+<li><p>Loading .class file from archives such as zip, jar, etc.</p>
+</li>
+<li><p>Loading .class file or data through the network.</p>
+</li>
+<li><p>Extract .class file from proprietary databases.</p>
+</li>
+<li><p>Upload the Java source file to the server, dynamically compile it into .class file and perform loading.</p>
+</li>
+</ol>
+<p>So we can create a malicious jar file and then insert the jar file data into the SQLite database as the BLOB data type.</p>
+<h5 id="0x02-About-Jolokia"><a href="#0x02-About-Jolokia" class="headerlink" title="0x02 About Jolokia"></a>0x02 About Jolokia</h5><p>First of all , let’s review the Jolokia concept and its historical vulnerablities. </p>
+<p>Jolokia is a JMX-HTTP bridge giving an alternative to JSR-160 connectors. It is an agent based approach with support for many platforms. In addition to basic JMX operations it enhances JMX remoting with unique features like bulk requests and fine grained security policies.</p>
+<p>In the past days, there are several security researchers have shared their findings about Jolokia.They disclose a lot of weaknesses that exist in the Jolokia component. If you are interested in the vulnerabilities, you could review their write-ups.</p>
+<p><a href="https://www.veracode.com/blog/research/exploiting-spring-boot-actuators">https://www.veracode.com/blog/research/exploiting-spring-boot-actuators</a></p>
+<p><a href="https://thinkloveshare.com/hacking/ssrf_to_rce_with_jolokia_and_mbeans/">https://thinkloveshare.com/hacking/ssrf_to_rce_with_jolokia_and_mbeans/</a></p>
+<p>I’m sure you’re aware Jololia often exposes many Mbeans, many of which are utilized to triger remote code execution vulnerabilities. In this case, we talk about the Mbean named <code>com.sun.management:type=DiagnosticCommand</code></p>
+<h5 id="0x03-JVMTI-amp-Instrument"><a href="#0x03-JVMTI-amp-Instrument" class="headerlink" title="0x03 JVMTI &amp; Instrument"></a>0x03 JVMTI &amp; Instrument</h5><p>In this case, Jolokia exposes the <code>com.sun.management:type=DiagnosticCommand</code> MBean, it has a risky operation named <code>jvmtiAgentLoad</code>. So what is JVMTI? </p>
+<p>JVMTI(JVM Tool Interface) which is the native interface provided by the java virtual machine. JVMTI is just a set of interfaces. If we want to develope JVM tools, we need to write an agent programme to use these interfaces. Agent programme is atually a C or C++ language written dynamic link library. So loading a malicious .so file can lead remote code exection. However, Java introduced <code>Instrumentation</code> since in JDK 5.</p>
+<p>Using Instrumentation interface, we can call the dynamic library of libinstrument through Java code to interact with the JVMTI interface, eliminating the need to develop native dynamic link library files.</p>
+<p>The Instrument mechanism includes two integration forms: one is the main method is executed before startup, and the other is the main method is loaded internally through attach.</p>
+<ul>
+<li>premain (Agent mode):  Main method is invoked before the target application starting.</li>
+</ul>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -javaagent:/path/to/javaagent.jar -jar application.jar</span><br></pre></td></tr></table></figure>
+
+<p>  The argument <code>-javaagent</code> needs to be in front of <code>-jar</code>. Otherwise, it will not take effect.</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">premain</span><span class="params">(String agentArgs, Instrumentation inst)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">premain</span><span class="params">(String agentArgs)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>The premain method is relatively simple. It’s a jar file of the java agent. After adding this jar to the startup command, the premain method will be run before the main method is started. It should be noted that to make the jar file know which premain method to start, we also need to define it in the manifest file. There are also two ways to define a menifast. One is to write a menifast file directly, and the other is to use Maven’s plug-in to write it.</p>
+<ul>
+<li><p>agentmain(Attach mode): In addition to the target application, use an attach application to inject javaagent.jar into the target application.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">agentmain</span><span class="params">(String agentArgs, Instrumentation inst)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">agentmain</span><span class="params">(String agentArgs)</span></span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>The attach method is relatively troublesome. You need to set up a separate application (or use a different thread), find all running VirtualMachineDescriptors through VirturalMachine. list(), match them to the target application, and then inject javaagent.jar into the target application.</p>
+<p>If you have known the above knowledge, it is not difficult to realize using the <code>jvmtiAgentLoad</code>operation of <code>com.sun.management:type=DiagnosticCommand</code> mbean，we can inject malicious java agent into the application by attach mode without restarting target application.</p>
+<h5 id="0x04-Create-malicious-Jar-file"><a href="#0x04-Create-malicious-Jar-file" class="headerlink" title="0x04 Create malicious Jar file"></a>0x04 Create malicious Jar file</h5><p>Firstly, the JDK provides two static methods, <code>premain</code> and <code>agentmain</code>, which can be used directly. Here I use the <code>agentmain</code> method.</p>
+<p><img src="/images/pasted-231.png" alt="upload successful"></p>
+<p>If you create <code>MANIFEST.MF</code> manually, you need to specify the Agent-Class, and finally build the jar file.</p>
+<p><img src="/images/pasted-232.png" alt="upload successful"></p>
+<p>It should be noted here that if a standard so file supported by JVMTI is called, there will be an error.</p>
+<p><code>&quot;Agent_OnAttach is not available in /tmp/ext.so &quot;</code></p>
+<p><img src="/images/pasted-233.png" alt="upload successful"></p>
+<p>The reason is that the JVMTI is invoked through the <code>Agent_ OnAttach</code> as the entry function, and then execute the following process to load the Java agent.</p>
+<ol>
+<li><p>Get <code>JNIEnv</code> to ensure that it has been successfully attached to the Java process.</p>
+</li>
+<li><p>Create and initialize <code>JPLISAgent</code>, then make <code>VMInit</code> monitoring (it will not be triggered), and the logic is the same as <code>OnLoad</code>.</p>
+</li>
+<li><p>Read Agent-Class and load it.</p>
+</li>
+</ol>
+<ol start="4">
+<li><p>Read the META-INFO related configuration and set the <code>mRetransformEnvironment ClassFileLoadHook</code> listening. The logic is the same as <code>OnLoad</code>.</p>
+</li>
+<li><p>Create an <code>InstrumentationImpl</code> instance.</p>
+</li>
+<li><p>Set the <code>mNormaltransformEnvironment ClassFileLoadHook</code> listening</p>
+</li>
+<li><p>Execute AgentMain method</p>
+</li>
+</ol>
+<p>The Java agent code as follow:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class JavaAgent &#123;</span><br><span class="line">    private static final String RCE_COMMAND = &quot;open -a calculator&quot;;</span><br><span class="line"></span><br><span class="line">    public static void cmd() &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Runtime.getRuntime().exec(RCE_COMMAND);</span><br><span class="line">        &#125; catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public static void agentmain(String args, Instrumentation inst) &#123;</span><br><span class="line">        System.out.println(&quot;In JavaAgent Agentmain&quot;);</span><br><span class="line">        cmd();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h5 id="Inject-malicious-jar-file-stream-into-database-file"><a href="#Inject-malicious-jar-file-stream-into-database-file" class="headerlink" title="Inject malicious jar file stream into database file"></a>Inject malicious jar file stream into database file</h5><p>Just use the JDBC Sink Connector feature.When establishing the SQLite JDBC connecting , a SQLite database file is created automatically, then insert the malicious jar file data into the database table. </p>
+<p>According the Oracle official document definition:</p>
+<p><img src="/images/pasted-234.png" alt="upload successful"></p>
+<p>We can clearly know that the jar file is a kind of archives, like zip, tar,etc. It has no restriction about the file name.Consequently we can embed the jar files in other files just like zip files, without affecting their normal usage.</p>
+<p>Eventually,when the SQLite database file exists in the local disk, using <code>jvmtiAgentLoad</code> operation to load the specified jar file.</p>
+<h5 id="Final-Inllustration"><a href="#Final-Inllustration" class="headerlink" title="Final Inllustration"></a>Final Inllustration</h5><p>Owing to the vulnerability being fixed, I set up a local environment to reproduce it.</p>
+<ul>
+<li><p>Inject malicious Java agent into SQLite database file</p>
+</li>
+<li><p>During JDBC connection, if the database file does not exist ever, a SQLite database file <code>foo.jar</code> will be automatically created through the <code>getConnection</code> method of <code>DriverManager</code> and then create a table through the other corresponding SQL statement.</p>
+</li>
+</ul>
+<ul>
+<li>Write the malicious Java agent into the database as Blob data type. In my illustration, I write the malicious <code>agent.jar</code> into the SQLite database file <code>test.jar</code>.</li>
+</ul>
+<p><img src="/images/pasted-235.png" alt="upload successful"></p>
+<ul>
+<li>Load Java agent</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1:8099/actuator/jolokia/exec/com.sun.management:type=DiagnosticCommand/jvmtiAgentLoad/!/tmp!/agent.jar</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Successfully attach the malicious Java agent and complete the RCE</li>
+</ul>
+<p><img src="/images/pasted-236.png" alt="upload successful"></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#0x01-Preface"><span class="toc-number">1.</span> <span class="toc-text">0x01 Preface</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Loading-class"><span class="toc-number">2.</span> <span class="toc-text">Loading class</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x02-About-Jolokia"><span class="toc-number">3.</span> <span class="toc-text">0x02 About Jolokia</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x03-JVMTI-amp-Instrument"><span class="toc-number">4.</span> <span class="toc-text">0x03 JVMTI &amp; Instrument</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x04-Create-malicious-Jar-file"><span class="toc-number">5.</span> <span class="toc-text">0x04 Create malicious Jar file</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Inject-malicious-jar-file-stream-into-database-file"><span class="toc-number">6.</span> <span class="toc-text">Inject malicious jar file stream into database file</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Final-Inllustration"><span class="toc-number">7.</span> <span class="toc-text">Final Inllustration</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&text=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&is_video=false&description=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack&body=Check out this article: http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&name=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&t=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+      <div class="footer-left">
+        Copyright &copy;
+        
+        
+        2022
+        by pyn3rd
+      </div>
+      <div class="footer-right">
+        <nav>
+          <ul>
+            <!--
+          --><li><a href="/">Home</a></li><!--
+        --><!--
+          --><li><a href="/archives/">Archives</a></li><!--
+        --><!--
+          --><li><a href="/about/">About</a></li><!--
+        --><!--
+          --><li><a href="/search/">Search</a></li><!--
+        -->
+          </ul>
+          <ul>
+            
+          </ul>
+        </nav>
+      </div>
+      
+</footer>
+
+
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
