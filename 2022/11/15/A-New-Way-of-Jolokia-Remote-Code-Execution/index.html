@@ -8,8 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
     <meta name="description" content="0x01 PrefaceLast week, I saw an interesting case about JDBC attack reported by @JJaaskela in HackerOne. It caught my attention, so I intended to analyse this case.  Here is the link of this report: ht">
 <meta property="og:type" content="article">
-<meta property="og:title" content="A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack">
-<meta property="og:url" content="http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/index.html">
+<meta property="og:title" content="A New Way of Jolokia Remote Code Execution">
+<meta property="og:url" content="http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/index.html">
 <meta property="og:site_name">
 <meta property="og:description" content="0x01 PrefaceLast week, I saw an interesting case about JDBC attack reported by @JJaaskela in HackerOne. It caught my attention, so I intended to analyse this case.  Here is the link of this report: ht">
 <meta property="og:locale" content="en_US">
@@ -21,7 +21,7 @@
 <meta property="og:image" content="http://yoursite.com/images/pasted-235.png">
 <meta property="og:image" content="http://yoursite.com/images/pasted-236.png">
 <meta property="article:published_time" content="2022-11-15T03:18:46.000Z">
-<meta property="article:modified_time" content="2022-11-26T03:02:51.315Z">
+<meta property="article:modified_time" content="2023-02-23T02:22:05.882Z">
 <meta property="article:author" content="by pyn3rd">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://yoursite.com/images/pasted-230.png">
@@ -45,7 +45,7 @@
       
     
     <!-- title -->
-    <title>A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack</title>
+    <title>A New Way of Jolokia Remote Code Execution</title>
     <!-- styles -->
     
 <link rel="stylesheet" href="/css/style.css">
@@ -101,17 +101,17 @@
     <br/>
     <div id="share" style="display: none">
       <ul>
-  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&text=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&is_video=false&description=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack&body=Check out this article: http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&name=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&t=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&text=A New Way of Jolokia Remote Code Execution"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&title=A New Way of Jolokia Remote Code Execution"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&is_video=false&description=A New Way of Jolokia Remote Code Execution"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=A New Way of Jolokia Remote Code Execution&body=Check out this article: http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&title=A New Way of Jolokia Remote Code Execution"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&title=A New Way of Jolokia Remote Code Execution"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&title=A New Way of Jolokia Remote Code Execution"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&title=A New Way of Jolokia Remote Code Execution"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&name=A New Way of Jolokia Remote Code Execution&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&t=A New Way of Jolokia Remote Code Execution"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
@@ -128,7 +128,7 @@
   <header>
     
     <h1 class="posttitle" itemprop="name headline">
-        A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack
+        A New Way of Jolokia Remote Code Execution
     </h1>
 
 
@@ -142,7 +142,7 @@
       
         <time datetime="2022-11-15T03:18:46.000Z" itemprop="datePublished">2022-11-15</time>
         
-        (Updated: <time datetime="2022-11-26T03:02:51.315Z" itemprop="dateModified">2022-11-26</time>)
+        (Updated: <time datetime="2023-02-23T02:22:05.882Z" itemprop="dateModified">2023-02-23</time>)
         
       
     </div>
@@ -295,17 +295,17 @@
 
     <div id="share-footer" style="display: none">
       <ul>
-  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&text=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&is_video=false&description=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack&body=Check out this article: http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&title=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&name=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://yoursite.com/2022/11/15/A-New-Way-to-Trigger-Jolokia-Remote-Code-Execution/&t=A New Way of Exploiting  Jolokia RCE&amp;JDBC Attack"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&text=A New Way of Jolokia Remote Code Execution"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&title=A New Way of Jolokia Remote Code Execution"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&is_video=false&description=A New Way of Jolokia Remote Code Execution"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=A New Way of Jolokia Remote Code Execution&body=Check out this article: http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&title=A New Way of Jolokia Remote Code Execution"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&title=A New Way of Jolokia Remote Code Execution"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&title=A New Way of Jolokia Remote Code Execution"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&title=A New Way of Jolokia Remote Code Execution"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&name=A New Way of Jolokia Remote Code Execution&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://yoursite.com/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/&t=A New Way of Jolokia Remote Code Execution"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
