@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
     <meta name="description" content="BackgroundA few days ago, I dealt with a blackmail incident involving an MSSQL database, which potentially evaded EDR detection. I intend to share the entire process. Upon analyzing the situation, I f">
 <meta property="og:type" content="article">
-<meta property="og:title" content="How to use MSSQL CLR assembly to bypass EDR">
+<meta property="og:title" content="How To Use MSSQL CLR Assembly To Bypass EDR">
 <meta property="og:url" content="http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/index.html">
 <meta property="og:site_name">
 <meta property="og:description" content="BackgroundA few days ago, I dealt with a blackmail incident involving an MSSQL database, which potentially evaded EDR detection. I intend to share the entire process. Upon analyzing the situation, I f">
@@ -27,7 +27,7 @@
 <meta property="og:image" content="http://yoursite.com/images/pasted-327.png">
 <meta property="og:image" content="http://yoursite.com/images/pasted-329.png">
 <meta property="article:published_time" content="2024-11-22T06:08:19.000Z">
-<meta property="article:modified_time" content="2024-11-22T07:18:52.372Z">
+<meta property="article:modified_time" content="2024-11-22T08:31:39.622Z">
 <meta property="article:author" content="by pyn3rd">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://yoursite.com/images/pasted-308.png">
@@ -51,7 +51,7 @@
       
     
     <!-- title -->
-    <title>How to use MSSQL CLR assembly to bypass EDR</title>
+    <title>How To Use MSSQL CLR Assembly To Bypass EDR</title>
     <!-- styles -->
     
 <link rel="stylesheet" href="/css/style.css">
@@ -106,16 +106,16 @@
     <div id="share" style="display: none">
       <ul>
   <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&text=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&is_video=false&description=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=How to use MSSQL CLR assembly to bypass EDR&body=Check out this article: http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&name=How to use MSSQL CLR assembly to bypass EDR&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&t=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&text=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&is_video=false&description=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=How To Use MSSQL CLR Assembly To Bypass EDR&body=Check out this article: http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&name=How To Use MSSQL CLR Assembly To Bypass EDR&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&t=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
@@ -132,7 +132,7 @@
   <header>
     
     <h1 class="posttitle" itemprop="name headline">
-        How to use MSSQL CLR assembly to bypass EDR
+        How To Use MSSQL CLR Assembly To Bypass EDR
     </h1>
 
 
@@ -146,7 +146,7 @@
       
         <time datetime="2024-11-22T06:08:19.000Z" itemprop="datePublished">2024-11-22</time>
         
-        (Updated: <time datetime="2024-11-22T07:18:52.372Z" itemprop="dateModified">2024-11-22</time>)
+        (Updated: <time datetime="2024-11-22T08:31:39.622Z" itemprop="dateModified">2024-11-22</time>)
         
       
     </div>
@@ -228,16 +228,16 @@
     <div id="share-footer" style="display: none">
       <ul>
   <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&text=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&is_video=false&description=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=How to use MSSQL CLR assembly to bypass EDR&body=Check out this article: http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&name=How to use MSSQL CLR assembly to bypass EDR&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&t=How to use MSSQL CLR assembly to bypass EDR"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&text=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&is_video=false&description=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=How To Use MSSQL CLR Assembly To Bypass EDR&body=Check out this article: http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&name=How To Use MSSQL CLR Assembly To Bypass EDR&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=http://yoursite.com/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&t=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
