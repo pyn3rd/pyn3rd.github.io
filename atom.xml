@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title></title>
-  
+  <icon>https://pyn3rd.github.io/icon.png</icon>
   
   <link href="https://pyn3rd.github.io/atom.xml" rel="self"/>
   
@@ -28,7 +28,7 @@
     
       
       
-    <summary type="html">&lt;h3 id=&quot;Background&quot;&gt;&lt;a href=&quot;#Background&quot; class=&quot;headerlink&quot; title=&quot;Background&quot;&gt;&lt;/a&gt;Background&lt;/h3&gt;&lt;p&gt;A few days ago, I dealt with a blackma</summary>
+    <summary type="html"></summary>
       
     
     
@@ -48,7 +48,7 @@
     
       
       
-    <summary type="html">&lt;h2 id=&quot;Preface&quot;&gt;&lt;a href=&quot;#Preface&quot; class=&quot;headerlink&quot; title=&quot;Preface&quot;&gt;&lt;/a&gt;Preface&lt;/h2&gt;&lt;p&gt;After analyzing Spring Kafka deserialization vulne</summary>
+    <summary type="html"></summary>
       
     
     
@@ -68,7 +68,7 @@
     
       
       
-    <summary type="html">&lt;p&gt;Several months ago, the Constrast Security Team reported a Java deserialization vulnerability about Spring Kafka to VMWare Security Team.</summary>
+    <summary type="html"></summary>
       
     
     
@@ -88,7 +88,7 @@
     
       
       
-    <summary type="html">&lt;h5 id=&quot;0x01-Preface&quot;&gt;&lt;a href=&quot;#0x01-Preface&quot; class=&quot;headerlink&quot; title=&quot;0x01 Preface&quot;&gt;&lt;/a&gt;0x01 Preface&lt;/h5&gt;&lt;p&gt;Here is the explicit descripti</summary>
+    <summary type="html"></summary>
       
     
     
@@ -108,8 +108,7 @@
     
       
       
-    <summary type="html">&lt;h5 id=&quot;0x01-Preface&quot;&gt;&lt;a href=&quot;#0x01-Preface&quot; class=&quot;headerlink&quot; title=&quot;0x01 Preface&quot;&gt;&lt;/a&gt;0x01 Preface&lt;/h5&gt;&lt;ul&gt;
-&lt;li&gt;What is Apache Commons S</summary>
+    <summary type="html"></summary>
       
     
     
@@ -129,7 +128,7 @@
     
       
       
-    <summary type="html">&lt;h5 id=&quot;0x01-Preface&quot;&gt;&lt;a href=&quot;#0x01-Preface&quot; class=&quot;headerlink&quot; title=&quot;0x01 Preface&quot;&gt;&lt;/a&gt;0x01 Preface&lt;/h5&gt;&lt;p&gt;Last week, I saw an interestin</summary>
+    <summary type="html"></summary>
       
     
     
@@ -149,9 +148,7 @@
     
       
       
-    <summary type="html">&lt;p&gt;Amazon Redshift JDBC Driver supports plenty of properties as well.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https://docs.aws.amazon.com/redshift/latest/mgmt</summary>
+    <summary type="html"></summary>
       
     
     
@@ -171,7 +168,7 @@
     
       
       
-    <summary type="html">&lt;h4 id=&quot;0x01-Forewords&quot;&gt;&lt;a href=&quot;#0x01-Forewords&quot; class=&quot;headerlink&quot; title=&quot;0x01 Forewords&quot;&gt;&lt;/a&gt;0x01 Forewords&lt;/h4&gt;&lt;p&gt;As you know, I have re</summary>
+    <summary type="html"></summary>
       
     
     
@@ -191,7 +188,7 @@
     
       
       
-    <summary type="html">&lt;h5 id=&quot;0x01-Forewords&quot;&gt;&lt;a href=&quot;#0x01-Forewords&quot; class=&quot;headerlink&quot; title=&quot;0x01 Forewords&quot;&gt;&lt;/a&gt;0x01 Forewords&lt;/h5&gt;&lt;p&gt;During our presentatio</summary>
+    <summary type="html"></summary>
       
     
     
@@ -211,7 +208,7 @@
     
       
       
-    <summary type="html">&lt;h5 id=&quot;0x01-Forewords&quot;&gt;&lt;a href=&quot;#0x01-Forewords&quot; class=&quot;headerlink&quot; title=&quot;0x01 Forewords&quot;&gt;&lt;/a&gt;0x01 Forewords&lt;/h5&gt;&lt;p&gt;In my previous present</summary>
+    <summary type="html"></summary>
       
     
     
@@ -231,7 +228,7 @@
     
       
       
-    <summary type="html">&lt;h5 id=&quot;0x01-Forewords&quot;&gt;&lt;a href=&quot;#0x01-Forewords&quot; class=&quot;headerlink&quot; title=&quot;0x01 Forewords&quot;&gt;&lt;/a&gt;0x01 Forewords&lt;/h5&gt;&lt;p&gt;Recently I see some di</summary>
+    <summary type="html"></summary>
       
     
     
@@ -251,7 +248,7 @@
     
       
       
-    <summary type="html">&lt;h5 id=&quot;Abstract&quot;&gt;&lt;a href=&quot;#Abstract&quot; class=&quot;headerlink&quot; title=&quot;Abstract&quot;&gt;&lt;/a&gt;Abstract&lt;/h5&gt;&lt;p&gt;Prior to spring-boot-actuator-logview 0.2.13, </summary>
+    <summary type="html"></summary>
       
     
     
