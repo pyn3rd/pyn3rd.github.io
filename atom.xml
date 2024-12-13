@@ -6,7 +6,7 @@
   <link href="https://pyn3rd.github.io/atom.xml" rel="self"/>
   
   <link href="https://pyn3rd.github.io/"/>
-  <updated>2024-11-22T08:31:39.622Z</updated>
+  <updated>2024-12-13T12:50:13.677Z</updated>
   <id>https://pyn3rd.github.io/</id>
   
   <author>
@@ -15,6 +15,24 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Databricks JDBC Attack via JAAS</title>
+    <link href="https://pyn3rd.github.io/2024/12/13/Databricks-JDBC-Attack-via-JAAS/"/>
+    <id>https://pyn3rd.github.io/2024/12/13/Databricks-JDBC-Attack-via-JAAS/</id>
+    <published>2024-12-13T12:09:19.000Z</published>
+    <updated>2024-12-13T12:50:13.677Z</updated>
+    
+    
+      
+      
+    <summary type="html">&lt;h3 id=&quot;Background-Story&quot;&gt;&lt;a href=&quot;#Background-Story&quot; class=&quot;headerlink&quot; title=&quot;Background Story&quot;&gt;&lt;/a&gt;Background Story&lt;/h3&gt;&lt;p&gt;Yesterday, I r</summary>
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>How To Use MSSQL CLR Assembly To Bypass EDR</title>
